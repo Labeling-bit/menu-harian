@@ -376,99 +376,52 @@ function render(){
 
 function startScrollAnimations(){
 
+  /*
+   * Animasi hanya dipicu ketika elemen MASUK / KELUAR viewport
+   * saat halaman benar-benar di-scroll.
+   *
+   * Tidak ada lagi listener scroll yang menghapus class "show"
+   * berulang-ulang. Ini mencegah tulisan/footer berkedip.
+   */
   const getTargets = () =>
     document.querySelectorAll(".scroll-animate, .stagger-card");
 
   if(!("IntersectionObserver" in window)){
-    getTargets().forEach(el=>el.classList.add("show"));
+    getTargets().forEach(el => el.classList.add("show"));
     return;
   }
 
-  let lastScrollY = window.scrollY;
-  let direction = "down";
-  let directionTimer = null;
-
-  function animateVisibleElements(){
-    const targets = getTargets();
-
-    targets.forEach(el => {
-      const rect = el.getBoundingClientRect();
-      const visible =
-        rect.bottom > 0 &&
-        rect.top < window.innerHeight;
-
-      if(visible){
-        // Reset lalu jalankan ulang agar animasi benar-benar replay
-        el.classList.remove("show");
-
-        // Paksa browser membaca layout supaya transition restart
-        void el.offsetWidth;
-
-        el.classList.add("show");
-      }
-    });
-  }
-
-  window.addEventListener("scroll", () => {
-    const currentY = window.scrollY;
-
-    if(currentY > lastScrollY){
-      if(direction !== "down"){
-        direction = "down";
-        clearTimeout(directionTimer);
-        directionTimer = setTimeout(animateVisibleElements, 30);
-      }
-    }else if(currentY < lastScrollY){
-      if(direction !== "up"){
-        direction = "up";
-        clearTimeout(directionTimer);
-        directionTimer = setTimeout(animateVisibleElements, 30);
-      }
-    }
-
-    lastScrollY = currentY;
-  }, {passive:true});
-
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
+      const el = entry.target;
 
       if(entry.isIntersecting){
-
-        // Tentukan arah masuk elemen
-        const rect = entry.boundingClientRect;
-
-        entry.target.classList.remove("show");
-        void entry.target.offsetWidth;
-
-        // Saat scroll turun: elemen datang dari bawah.
-        // Saat scroll naik: elemen datang dari atas.
-        if(direction === "up" || rect.top < 0){
-          entry.target.classList.add("show");
-        }else{
-          entry.target.classList.add("show");
-        }
-
+        // Masuk layar -> jalankan animasi sekali.
+        el.classList.add("show");
       }else{
-        // Keluar layar -> reset.
-        // Nanti saat masuk lagi animasi akan dimainkan.
-        entry.target.classList.remove("show");
+        // Sudah benar-benar keluar area animasi.
+        // Reset agar animasi dapat dimainkan lagi ketika
+        // user scroll ke arah sebaliknya.
+        el.classList.remove("show");
       }
-
     });
   },{
-    threshold:0.01,
-    rootMargin:"-40px 0px -40px 0px"
+    threshold:0.12,
+    rootMargin:"-70px 0px -70px 0px"
   });
 
-  // Elemen dinamis seperti kartu porsi/gizi ikut terdeteksi
   function observeTargets(){
-    getTargets().forEach(el => observer.observe(el));
+    getTargets().forEach(el => {
+      if(!el.dataset.animationObserved){
+        el.dataset.animationObserved = "1";
+        observer.observe(el);
+      }
+    });
   }
 
   observeTargets();
 
-  // Karena data.js dirender sebelum fungsi ini dipanggil,
-  // cek sekali lagi setelah DOM selesai.
+  // Kartu dinamis dari data.js ikut diamati setelah dirender.
   setTimeout(observeTargets, 100);
 }
 
