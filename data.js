@@ -1,40 +1,4 @@
-// =============================
-// DATA MENU HARIAN
-// =============================
-// Tambahkan tanggal baru dengan format:
-// "YYYY-MM-DD": {
-//   menu: ["Makanan 1", "Makanan 2"],
-//   portions: [...],
-//   nutrition: [...],
-//   batas_konsumsi: "tanggal / waktu"
-// }
-//
-// Jangan menghapus tanda koma dan kurung.
-
-const siteInfo = {
-  instansi: "SPPG Lamongan Sugio Gergam 2"
-};
-
-const menuData = {
-  "2026-08-28": {
-    menu: [
-      "Garlic Butter Rice",
-      "Ayam Goreng Daun Jeruk",
-      "Tempe Goreng",
-      "Tumis Kacang Panjang & Wortel",
-      "Pisang"
-    ],
-
-    portions: [
-      {
-        nama: "PORSI BESAR",
-        harga: "Rp 9.650",
-        items: [
-          "Garlic Butter Rice — Rp 2.000",
-          "Ayam Goreng Daun Jeruk — Rp 4.200",
-          "Tempe Goreng — Rp 750",
-          "Tumis Kacang Panjang, Wortel — Rp 1.200",
-          "Pisang — Rp 1.500"
+const siteInfo={instansi:"SPPG Lamongan Sugio Gergam 2"};const menuData={};          "Pisang — Rp 1.500"
         ]
       },
       {
