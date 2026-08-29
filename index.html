@@ -286,7 +286,7 @@ footer{text-align:center;padding:25px 10px;color:var(--muted);font-size:14px}
   <div class="expiry" id="expiry"></div>
 </section>
 
-<footer class="scroll-animate one-way-animation">
+<footer>
   Informasi menu dan gizi • Data ditampilkan hanya untuk menu terbaru.
 </footer>
 
@@ -385,59 +385,19 @@ function startScrollAnimations(){
   }
 
   /*
-   * Elemen biasa:
-   * - muncul saat masuk viewport
-   * - reset saat keluar viewport
-   * - dapat dianimasikan kembali ketika masuk lagi
-   *
-   * Elemen .one-way-animation:
-   * - TIDAK dianimasikan saat halaman pertama dibuka
-   * - hanya dianimasikan SEKALI ketika user scroll ke bawah
-   * - setelah muncul, class "show" tidak pernah dihapus
-   * - scroll ke atas tidak memicu animasi lagi
+   * Animasi dibuat lebih smooth:
+   * - Tidak ada listener scroll yang memaksa restart animasi.
+   * - IntersectionObserver hanya mengubah state saat elemen
+   *   benar-benar masuk/keluar area layar.
+   * - Durasi dan easing mengikuti CSS yang halus.
+   * - Batas Konsumsi tetap bisa dianimasikan saat masuk,
+   *   tetapi footer di bawahnya tidak lagi dianimasikan.
    */
-
-  let hasUserScrolled = false;
-  let scrollDirection = "down";
-  let lastScrollY = window.scrollY;
-
-  window.addEventListener("scroll", () => {
-    const currentY = window.scrollY;
-
-    if(currentY > lastScrollY){
-      scrollDirection = "down";
-      hasUserScrolled = true;
-    }else if(currentY < lastScrollY){
-      scrollDirection = "up";
-      hasUserScrolled = true;
-    }
-
-    lastScrollY = currentY;
-  }, {passive:true});
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       const el = entry.target;
 
-      if(el.classList.contains("one-way-animation")){
-
-        // Hanya boleh muncul setelah user benar-benar
-        // melakukan scroll ke bawah.
-        if(
-          entry.isIntersecting &&
-          hasUserScrolled &&
-          scrollDirection === "down" &&
-          !el.classList.contains("show")
-        ){
-          el.classList.add("show");
-        }
-
-        // PENTING:
-        // Jangan pernah menghapus "show" dari elemen satu arah.
-        return;
-      }
-
-      // Animasi elemen lainnya tetap normal.
       if(entry.isIntersecting){
         el.classList.add("show");
       }else{
@@ -445,8 +405,8 @@ function startScrollAnimations(){
       }
     });
   },{
-    threshold:0.12,
-    rootMargin:"-70px 0px -70px 0px"
+    threshold:0.08,
+    rootMargin:"-20px 0px -20px 0px"
   });
 
   function observeTargets(){
