@@ -281,12 +281,12 @@ footer{text-align:center;padding:25px 10px;color:var(--muted);font-size:14px}
   <div id="nutritionCards"></div>
 </section>
 
-<section class="section scroll-animate">
+<section class="section scroll-animate one-way-animation">
   <h2>⏰ Batas Konsumsi</h2>
   <div class="expiry" id="expiry"></div>
 </section>
 
-<footer class="scroll-animate">
+<footer class="scroll-animate one-way-animation">
   Informasi menu dan gizi • Data ditampilkan hanya untuk menu terbaru.
 </footer>
 
@@ -376,13 +376,6 @@ function render(){
 
 function startScrollAnimations(){
 
-  /*
-   * Animasi hanya dipicu ketika elemen MASUK / KELUAR viewport
-   * saat halaman benar-benar di-scroll.
-   *
-   * Tidak ada lagi listener scroll yang menghapus class "show"
-   * berulang-ulang. Ini mencegah tulisan/footer berkedip.
-   */
   const getTargets = () =>
     document.querySelectorAll(".scroll-animate, .stagger-card");
 
@@ -391,17 +384,63 @@ function startScrollAnimations(){
     return;
   }
 
+  /*
+   * Elemen biasa:
+   * - muncul saat masuk viewport
+   * - reset saat keluar viewport
+   * - dapat dianimasikan kembali ketika masuk lagi
+   *
+   * Elemen .one-way-animation:
+   * - TIDAK dianimasikan saat halaman pertama dibuka
+   * - hanya dianimasikan SEKALI ketika user scroll ke bawah
+   * - setelah muncul, class "show" tidak pernah dihapus
+   * - scroll ke atas tidak memicu animasi lagi
+   */
+
+  let hasUserScrolled = false;
+  let scrollDirection = "down";
+  let lastScrollY = window.scrollY;
+
+  window.addEventListener("scroll", () => {
+    const currentY = window.scrollY;
+
+    if(currentY > lastScrollY){
+      scrollDirection = "down";
+      hasUserScrolled = true;
+    }else if(currentY < lastScrollY){
+      scrollDirection = "up";
+      hasUserScrolled = true;
+    }
+
+    lastScrollY = currentY;
+  }, {passive:true});
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       const el = entry.target;
 
+      if(el.classList.contains("one-way-animation")){
+
+        // Hanya boleh muncul setelah user benar-benar
+        // melakukan scroll ke bawah.
+        if(
+          entry.isIntersecting &&
+          hasUserScrolled &&
+          scrollDirection === "down" &&
+          !el.classList.contains("show")
+        ){
+          el.classList.add("show");
+        }
+
+        // PENTING:
+        // Jangan pernah menghapus "show" dari elemen satu arah.
+        return;
+      }
+
+      // Animasi elemen lainnya tetap normal.
       if(entry.isIntersecting){
-        // Masuk layar -> jalankan animasi sekali.
         el.classList.add("show");
       }else{
-        // Sudah benar-benar keluar area animasi.
-        // Reset agar animasi dapat dimainkan lagi ketika
-        // user scroll ke arah sebaliknya.
         el.classList.remove("show");
       }
     });
@@ -421,7 +460,7 @@ function startScrollAnimations(){
 
   observeTargets();
 
-  // Kartu dinamis dari data.js ikut diamati setelah dirender.
+  // Kartu dinamis dari data.js ikut diamati.
   setTimeout(observeTargets, 100);
 }
 
