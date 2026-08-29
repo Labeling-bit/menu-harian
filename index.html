@@ -196,7 +196,7 @@ footer{
 /* Semua section akan muncul lagi setiap kali masuk layar */
 .scroll-animate{
   opacity:0;
-  transform:translateY(70px) scale(.97);
+  transform:translateY(85px) scale(.96);
   filter:blur(3px);
   transition:
     opacity .8s cubic-bezier(.22,1,.36,1),
@@ -448,38 +448,100 @@ function render(){
 
 function startScrollAnimations(){
 
-  const targets=document.querySelectorAll(
-    ".scroll-animate, .stagger-card"
-  );
+  const getTargets = () =>
+    document.querySelectorAll(".scroll-animate, .stagger-card");
 
   if(!("IntersectionObserver" in window)){
-    targets.forEach(el=>el.classList.add("show"));
+    getTargets().forEach(el=>el.classList.add("show"));
     return;
   }
 
-  const observer=new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
+  let lastScrollY = window.scrollY;
+  let direction = "down";
+  let directionTimer = null;
+
+  function animateVisibleElements(){
+    const targets = getTargets();
+
+    targets.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      const visible =
+        rect.bottom > 0 &&
+        rect.top < window.innerHeight;
+
+      if(visible){
+        // Reset lalu jalankan ulang agar animasi benar-benar replay
+        el.classList.remove("show");
+
+        // Paksa browser membaca layout supaya transition restart
+        void el.offsetWidth;
+
+        el.classList.add("show");
+      }
+    });
+  }
+
+  window.addEventListener("scroll", () => {
+    const currentY = window.scrollY;
+
+    if(currentY > lastScrollY){
+      if(direction !== "down"){
+        direction = "down";
+        clearTimeout(directionTimer);
+        directionTimer = setTimeout(animateVisibleElements, 30);
+      }
+    }else if(currentY < lastScrollY){
+      if(direction !== "up"){
+        direction = "up";
+        clearTimeout(directionTimer);
+        directionTimer = setTimeout(animateVisibleElements, 30);
+      }
+    }
+
+    lastScrollY = currentY;
+  }, {passive:true});
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
 
       if(entry.isIntersecting){
 
-        // Masuk layar: jalankan animasi
-        entry.target.classList.add("show");
+        // Tentukan arah masuk elemen
+        const rect = entry.boundingClientRect;
+
+        entry.target.classList.remove("show");
+        void entry.target.offsetWidth;
+
+        // Saat scroll turun: elemen datang dari bawah.
+        // Saat scroll naik: elemen datang dari atas.
+        if(direction === "up" || rect.top < 0){
+          entry.target.classList.add("show");
+        }else{
+          entry.target.classList.add("show");
+        }
 
       }else{
-
-        // Keluar layar: reset supaya bisa dianimasikan lagi
-        // saat pengguna scroll kembali ke atas/bawah.
+        // Keluar layar -> reset.
+        // Nanti saat masuk lagi animasi akan dimainkan.
         entry.target.classList.remove("show");
-
       }
 
     });
   },{
-    threshold:0.12,
-    rootMargin:"0px 0px -50px 0px"
+    threshold:0.01,
+    rootMargin:"-40px 0px -40px 0px"
   });
 
-  targets.forEach(el=>observer.observe(el));
+  // Elemen dinamis seperti kartu porsi/gizi ikut terdeteksi
+  function observeTargets(){
+    getTargets().forEach(el => observer.observe(el));
+  }
+
+  observeTargets();
+
+  // Karena data.js dirender sebelum fungsi ini dipanggil,
+  // cek sekali lagi setelah DOM selesai.
+  setTimeout(observeTargets, 100);
 }
 
 render();
