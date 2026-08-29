@@ -163,6 +163,24 @@ footer{
   h2{font-size:28px}
   .card-grid{grid-template-columns:1fr}
 }
+
+/* ANIMASI SAAT SCROLL */
+.scroll-animate{
+  opacity:0;
+  transform:translateY(45px);
+  transition:opacity .75s ease, transform .75s ease;
+  will-change:opacity,transform;
+}
+.scroll-animate.show{opacity:1;transform:translateY(0)}
+.photo-section-animate.show img{animation:photoReveal .9s ease both}
+@keyframes photoReveal{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+.stagger-card{opacity:0;transform:translateY(25px);transition:opacity .6s ease,transform .6s ease}
+.stagger-card.show{opacity:1;transform:translateY(0)}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .scroll-animate,.stagger-card{opacity:1;transform:none;transition:none}
+  .photo-section-animate.show img{animation:none}
+}
 </style>
 </head>
 
@@ -177,32 +195,32 @@ footer{
   <div class="badge">MENU HARI INI • INFORMASI GIZI</div>
 </section>
 
-<section class="section" id="photoSection" style="display:none">
+<section class="section scroll-animate photo-section-animate" id="photoSection" style="display:none">
   <h2>📷 Foto Menu</h2>
   <img id="photo" class="photo" alt="Foto menu">
 </section>
 
-<section class="section">
+<section class="section scroll-animate">
   <h2>🍽️ Menu</h2>
   <ul class="menu-list" id="menuList"></ul>
 </section>
 
-<section class="section" id="portionSection" style="display:none">
+<section class="section scroll-animate" id="portionSection" style="display:none">
   <h2>🥗 Pilihan Porsi</h2>
   <div class="card-grid" id="portionCards"></div>
 </section>
 
-<section class="section">
+<section class="section scroll-animate">
   <h2>❤️ Informasi Gizi</h2>
   <div id="nutritionCards"></div>
 </section>
 
-<section class="section">
+<section class="section scroll-animate">
   <h2>⏰ Batas Konsumsi</h2>
   <div class="expiry" id="expiry"></div>
 </section>
 
-<footer>
+<footer class="scroll-animate">
   Informasi menu dan gizi • Data ditampilkan hanya untuk menu terbaru.
 </footer>
 
@@ -257,8 +275,8 @@ function render(){
   const portions=Array.isArray(data.portions)?data.portions:[];
   if(portions.length){
     document.getElementById("portionSection").style.display="block";
-    document.getElementById("portionCards").innerHTML=portions.map(p=>`
-      <div class="small-card">
+    document.getElementById("portionCards").innerHTML=portions.map((p,index)=>`
+      <div class="small-card stagger-card" style="transition-delay:${index*100}ms">
         <h3>${p.nama||"Porsi"}</h3>
         ${p.harga?`<div class="price">${p.harga}</div>`:""}
         ${Array.isArray(p.items)?`<ul class="items">${p.items.map(i=>`<li>${i}</li>`).join("")}</ul>`:""}
@@ -271,8 +289,8 @@ function render(){
     document.getElementById("nutritionCards").innerHTML =
       '<div class="empty">Belum ada informasi gizi.</div>';
   }else{
-    document.getElementById("nutritionCards").innerHTML=nutrition.map(n=>`
-      <div class="nutrition-card">
+    document.getElementById("nutritionCards").innerHTML=nutrition.map((n,index)=>`
+      <div class="nutrition-card stagger-card" style="transition-delay:${index*100}ms">
         <h3>${n.nama||"Informasi Gizi"}</h3>
         ${n.total_porsi?`<p class="total"><strong>Total porsi:</strong> ${n.total_porsi}</p>`:""}
         <div class="nut-row"><span>Energi</span><strong>${n.energi||"-"}</strong></div>
@@ -290,7 +308,25 @@ function render(){
       : "Belum ada informasi batas konsumsi.";
 }
 
+function startScrollAnimations(){
+  const targets=document.querySelectorAll(".scroll-animate,.stagger-card");
+  if(!("IntersectionObserver" in window)){
+    targets.forEach(el=>el.classList.add("show"));
+    return;
+  }
+  const observer=new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add("show");
+        observer.unobserve(entry.target);
+      }
+    });
+  },{threshold:0.12,rootMargin:"0px 0px -50px 0px"});
+  targets.forEach(el=>observer.observe(el));
+}
+
 render();
+startScrollAnimations();
 </script>
 </body>
 </html>
