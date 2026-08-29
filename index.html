@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f59e0b">
+  <title>Menu Hari Ini - SPPG Lamongan Sugio</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f6f0e6;
+      color: #172033;
+    }
+    .container { max-width: 900px; margin: auto; padding: 18px; }
+    .hero {
+      background: linear-gradient(135deg, #fffaf0, #f8dfb5);
+      border-radius: 24px;
+      padding: 26px 20px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(0,0,0,.08);
+      border: 1px solid #ead8bc;
+    }
+    .brand { font-weight: 800; letter-spacing: .5px; color: #263449; }
+    .title { font-size: clamp(34px, 9vw, 64px); margin: 12px 0 0; font-weight: 900; }
+    .subtitle { color: #9b4a1e; font-size: clamp(26px, 7vw, 48px); font-weight: 800; font-style: italic; margin: 0 0 10px; }
+    .date { font-size: 20px; font-weight: 800; }
+    .badge {
+      display: inline-block; margin-top: 10px; padding: 8px 14px; border-radius: 999px;
+      background: #172033; color: white; font-size: 13px; font-weight: 700;
+    }
+    .section {
+      margin-top: 18px; background: white; border-radius: 20px; padding: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.06);
+    }
+    .section h2 { margin: 0 0 14px; font-size: 24px; }
+    .menu-list { margin: 0; padding-left: 22px; line-height: 1.8; font-size: 17px; }
+    .portions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .card {
+      border: 2px solid #f2b544; border-radius: 18px; padding: 17px;
+      background: #fffaf0;
+    }
+    .card h3 { margin: 0 0 8px; font-size: 20px; }
+    .price { font-weight: 800; margin-bottom: 12px; }
+    .items { margin: 0; padding-left: 19px; line-height: 1.65; }
+    .nutrition { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .nutri {
+      background: #f59e0b; color: white; border-radius: 15px; padding: 13px 8px;
+      text-align: center; font-weight: 800;
+    }
+    .nutri small { display: block; font-weight: 600; font-size: 11px; margin-bottom: 4px; }
+    .expiry {
+      background: #fff4cf; border-left: 6px solid #f59e0b; border-radius: 14px;
+      padding: 15px; line-height: 1.6;
+    }
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    input[type="date"] {
+      padding: 11px 13px; border: 1px solid #ccc; border-radius: 10px; font-size: 15px;
+    }
+    button {
+      border: 0; border-radius: 10px; padding: 11px 15px; background: #172033;
+      color: white; font-weight: 700; cursor: pointer;
+    }
+    .empty { text-align: center; padding: 30px 10px; color: #667085; }
+    footer { text-align: center; padding: 25px 10px; color: #667085; font-size: 13px; }
+    @media (max-width: 650px) {
+      .portions { grid-template-columns: 1fr; }
+      .nutrition { grid-template-columns: repeat(2, 1fr); }
+      .container { padding: 12px; }
+      .hero { padding: 22px 14px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <div class="brand" id="brand"></div>
+      <div class="title">MENU</div>
+      <div class="subtitle">Special Today's</div>
+      <div class="date" id="dateText"></div>
+      <div class="badge">MENU HARI INI • INFORMASI GIZI</div>
+    </section>
+
+    <section class="section">
+      <h2>🍽️ Menu</h2>
+      <ul class="menu-list" id="menuList"></ul>
+    </section>
+
+    <section class="section">
+      <h2>🥗 Pilihan Porsi</h2>
+      <div class="portions" id="portionCards"></div>
+    </section>
+
+    <section class="section">
+      <h2>📊 Analisis Kandungan Gizi</h2>
+      <div class="portions" id="nutritionCards"></div>
+    </section>
+
+    <section class="section">
+      <h2>⏰ Batas Konsumsi</h2>
+      <div class="expiry" id="expiry"></div>
+    </section>
+
+    <section class="section">
+      <h2>🔎 Cek Menu Berdasarkan Tanggal</h2>
+      <div class="controls">
+        <input type="date" id="datePicker">
+        <button onclick="loadSelectedDate()">Tampilkan</button>
+        <button onclick="loadToday()">Hari Ini</button>
+      </div>
+    </section>
+
+    <footer>
+      Informasi menu dan gizi • Silakan sesuaikan data dengan data resmi instansi.
+    </footer>
+  </main>
+
+  <script src="data.js"></script>
+  <script>
+    const monthNames = [
+      "Januari","Februari","Maret","April","Mei","Juni",
+      "Juli","Agustus","September","Oktober","November","Desember"
+    ];
+
+    function formatDate(dateString) {
+      const d = new Date(dateString + "T00:00:00");
+      return `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function render(dateString) {
+      const data = menuData[dateString];
+      document.getElementById("datePicker").value = dateString;
+      document.getElementById("brand").textContent = siteInfo.instansi;
+
+      if (!data) {
+        document.getElementById("dateText").textContent = formatDate(dateString);
+        document.getElementById("menuList").innerHTML = "";
+        document.getElementById("portionCards").innerHTML = "";
+        document.getElementById("nutritionCards").innerHTML = "";
+        document.getElementById("expiry").innerHTML =
+          `<strong>Menu belum tersedia.</strong><br>
+           Belum ada data menu untuk ${formatDate(dateString)}.`;
+        return;
+      }
+
+      document.getElementById("dateText").textContent = formatDate(dateString);
+
+      document.getElementById("menuList").innerHTML =
+        data.menu.map(item => `<li>${item}</li>`).join("");
+
+      document.getElementById("portionCards").innerHTML =
+        data.portions.map(p => `
+          <div class="card">
+            <h3>${p.nama}</h3>
+            <div class="price">${p.harga}</div>
+            <ul class="items">${p.items.map(i => `<li>${i}</li>`).join("")}</ul>
+          </div>
+        `).join("");
+
+      document.getElementById("nutritionCards").innerHTML =
+        data.nutrition.map(n => `
+          <div class="card">
+            <h3>${n.nama}</h3>
+            <p><strong>Total porsi:</strong> ${n.total_porsi}</p>
+            <div class="nutrition">
+              <div class="nutri"><small>ENERGI</small>${n.energi}</div>
+              <div class="nutri"><small>PROTEIN</small>${n.protein}</div>
+              <div class="nutri"><small>LEMAK</small>${n.lemak}</div>
+              <div class="nutri"><small>KARBO</small>${n.karbohidrat}</div>
+              <div class="nutri"><small>SERAT</small>${n.serat}</div>
+            </div>
+          </div>
+        `).join("");
+
+      document.getElementById("expiry").innerHTML =
+        `<strong>Batas konsumsi:</strong> ${data.batas_konsumsi}`;
+    }
+
+    function todayLocal() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,"0");
+      const day = String(d.getDate()).padStart(2,"0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function loadToday() { render(todayLocal()); }
+    function loadSelectedDate() {
+      const value = document.getElementById("datePicker").value;
+      if (value) render(value);
+    }
+
+    // Untuk demo awal, tampilkan data contoh 28 Agustus 2026
+    // Setelah data baru ditambahkan, website otomatis menampilkan menu sesuai tanggal hari ini.
+    const initialDate = menuData[todayLocal()] ? todayLocal() : "2026-08-28";
+    render(initialDate);
+  </script>
+</body>
+</html>
