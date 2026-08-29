@@ -4,19 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Menu Hari Ini</title>
+
 <style>
 *{box-sizing:border-box}
+
+html{
+  scroll-behavior:smooth;
+}
+
 body{
   margin:0;
   background:#f7f0e5;
   color:#15243b;
   font-family:Georgia,serif;
+  overflow-x:hidden;
 }
+
 .container{
   max-width:900px;
   margin:auto;
   padding:14px;
 }
+
 .hero,.section{
   background:#fff;
   border-radius:24px;
@@ -24,32 +33,39 @@ body{
   margin:14px 0;
   box-shadow:0 7px 24px rgba(0,0,0,.07);
 }
+
 .hero{
   text-align:center;
   background:linear-gradient(135deg,#fffaf0,#f9dfad);
+  animation:heroEnter 1s cubic-bezier(.22,1,.36,1) both;
 }
+
 .brand{
   font-size:22px;
   font-weight:bold;
   margin-bottom:8px;
 }
+
 .title{
   font-size:64px;
   line-height:1;
   font-weight:900;
   margin:8px 0;
 }
+
 .subtitle{
   font-size:40px;
   color:#a34c1d;
   font-style:italic;
   margin:8px 0;
 }
+
 .date{
   font-size:25px;
   font-weight:bold;
   margin:10px 0;
 }
+
 .badge{
   display:block;
   background:#15243b;
@@ -60,55 +76,67 @@ body{
   font-size:19px;
   max-width:680px;
 }
+
 h2{
   margin:0 0 18px;
   font-size:30px;
 }
+
 .menu-list{
   margin:0;
   padding-left:28px;
 }
+
 .menu-list li{
   font-size:21px;
   line-height:1.6;
   margin:7px 0;
 }
+
 .photo{
   width:100%;
   max-height:600px;
   object-fit:contain;
   border-radius:16px;
   background:#eee;
+  display:block;
 }
+
 .card-grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:16px;
 }
+
 .small-card{
   border:2px solid #efb43f;
   border-radius:18px;
   padding:18px;
   background:#fffaf0;
 }
+
 .small-card h3{
   margin:0 0 12px;
   font-size:23px;
 }
+
 .price{
   font-weight:800;
   font-size:19px;
   margin-bottom:10px;
 }
+
 .items{
   margin:0;
   padding-left:22px;
 }
+
 .items li{
   font-size:18px;
   line-height:1.55;
   margin:5px 0;
 }
+
 .nutrition-card{
   border:2px solid #efb43f;
   border-radius:18px;
@@ -116,14 +144,17 @@ h2{
   background:#fffaf0;
   margin-bottom:14px;
 }
+
 .nutrition-card h3{
   margin:0 0 12px;
   font-size:23px;
 }
+
 .total{
   margin:0 0 14px;
   font-size:17px;
 }
+
 .nut-row{
   display:flex;
   justify-content:space-between;
@@ -132,7 +163,9 @@ h2{
   border-bottom:1px solid #e5d9c5;
   font-size:19px;
 }
+
 .nut-row:last-child{border-bottom:0}
+
 .expiry{
   background:#fff1c9;
   border-left:7px solid #f59e0b;
@@ -141,18 +174,141 @@ h2{
   font-size:20px;
   line-height:1.6;
 }
+
 .empty{
   text-align:center;
   color:#667085;
   font-size:20px;
   padding:20px 5px;
 }
+
 footer{
   text-align:center;
   padding:25px 10px;
   color:#667085;
   font-size:14px;
 }
+
+/* =========================
+   ANIMASI SCROLL
+   ========================= */
+
+/* Semua section akan muncul lagi setiap kali masuk layar */
+.scroll-animate{
+  opacity:0;
+  transform:translateY(70px) scale(.97);
+  filter:blur(3px);
+  transition:
+    opacity .8s cubic-bezier(.22,1,.36,1),
+    transform .8s cubic-bezier(.22,1,.36,1),
+    filter .8s ease;
+  will-change:opacity,transform,filter;
+}
+
+.scroll-animate.show{
+  opacity:1;
+  transform:translateY(0) scale(1);
+  filter:blur(0);
+}
+
+/* Efek foto: zoom + sedikit naik */
+.photo-section-animate .photo{
+  opacity:0;
+  transform:scale(.88) translateY(25px);
+  transition:
+    opacity .9s ease,
+    transform 1s cubic-bezier(.22,1,.36,1);
+  will-change:opacity,transform;
+}
+
+.photo-section-animate.show .photo{
+  opacity:1;
+  transform:scale(1) translateY(0);
+}
+
+/* Efek judul section */
+.scroll-animate h2{
+  opacity:0;
+  transform:translateX(-25px);
+  transition:
+    opacity .7s ease .08s,
+    transform .7s cubic-bezier(.22,1,.36,1) .08s;
+}
+
+.scroll-animate.show h2{
+  opacity:1;
+  transform:translateX(0);
+}
+
+/* Kartu-kartu muncul bergantian */
+.stagger-card{
+  opacity:0;
+  transform:translateY(35px) scale(.96);
+  transition:
+    opacity .65s cubic-bezier(.22,1,.36,1),
+    transform .65s cubic-bezier(.22,1,.36,1);
+  will-change:opacity,transform;
+}
+
+.stagger-card.show{
+  opacity:1;
+  transform:translateY(0) scale(1);
+}
+
+/* Item menu muncul satu per satu */
+.menu-list li{
+  opacity:0;
+  transform:translateX(-18px);
+  transition:
+    opacity .55s ease,
+    transform .55s cubic-bezier(.22,1,.36,1);
+}
+
+.scroll-animate.show .menu-list li{
+  opacity:1;
+  transform:translateX(0);
+}
+
+.scroll-animate.show .menu-list li:nth-child(1){transition-delay:.08s}
+.scroll-animate.show .menu-list li:nth-child(2){transition-delay:.16s}
+.scroll-animate.show .menu-list li:nth-child(3){transition-delay:.24s}
+.scroll-animate.show .menu-list li:nth-child(4){transition-delay:.32s}
+.scroll-animate.show .menu-list li:nth-child(5){transition-delay:.40s}
+.scroll-animate.show .menu-list li:nth-child(6){transition-delay:.48s}
+
+/* Animasi hero saat halaman pertama dibuka */
+@keyframes heroEnter{
+  from{
+    opacity:0;
+    transform:translateY(-25px) scale(.97);
+    filter:blur(4px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    filter:blur(0);
+  }
+}
+
+/* Aksesibilitas */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+
+  .hero,
+  .scroll-animate,
+  .stagger-card,
+  .photo-section-animate .photo,
+  .scroll-animate h2,
+  .menu-list li{
+    opacity:1;
+    transform:none;
+    filter:none;
+    transition:none;
+    animation:none;
+  }
+}
+
+/* Tampilan HP */
 @media(max-width:650px){
   .container{padding:10px}
   .hero,.section{padding:20px}
@@ -162,24 +318,6 @@ footer{
   .badge{font-size:17px}
   h2{font-size:28px}
   .card-grid{grid-template-columns:1fr}
-}
-
-/* ANIMASI SAAT SCROLL */
-.scroll-animate{
-  opacity:0;
-  transform:translateY(45px);
-  transition:opacity .75s ease, transform .75s ease;
-  will-change:opacity,transform;
-}
-.scroll-animate.show{opacity:1;transform:translateY(0)}
-.photo-section-animate.show img{animation:photoReveal .9s ease both}
-@keyframes photoReveal{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
-.stagger-card{opacity:0;transform:translateY(25px);transition:opacity .6s ease,transform .6s ease}
-.stagger-card.show{opacity:1;transform:translateY(0)}
-@media(prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  .scroll-animate,.stagger-card{opacity:1;transform:none;transition:none}
-  .photo-section-animate.show img{animation:none}
 }
 </style>
 </head>
@@ -309,24 +447,44 @@ function render(){
 }
 
 function startScrollAnimations(){
-  const targets=document.querySelectorAll(".scroll-animate,.stagger-card");
+
+  const targets=document.querySelectorAll(
+    ".scroll-animate, .stagger-card"
+  );
+
   if(!("IntersectionObserver" in window)){
     targets.forEach(el=>el.classList.add("show"));
     return;
   }
+
   const observer=new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
+
       if(entry.isIntersecting){
+
+        // Masuk layar: jalankan animasi
         entry.target.classList.add("show");
-        observer.unobserve(entry.target);
+
+      }else{
+
+        // Keluar layar: reset supaya bisa dianimasikan lagi
+        // saat pengguna scroll kembali ke atas/bawah.
+        entry.target.classList.remove("show");
+
       }
+
     });
-  },{threshold:0.12,rootMargin:"0px 0px -50px 0px"});
+  },{
+    threshold:0.12,
+    rootMargin:"0px 0px -50px 0px"
+  });
+
   targets.forEach(el=>observer.observe(el));
 }
 
 render();
 startScrollAnimations();
 </script>
+
 </body>
 </html>
