@@ -6,25 +6,17 @@ const siteInfo = {
     "menu": [
       "ayam",
       "tahu",
+      "nasi",
       "pisang"
     ],
     "nutrition": [
       {
-        "nama": "Porsi Kecil",
-        "energi": "12",
-        "protein": "12",
-        "lemak": "12",
-        "karbohidrat": "12",
-        "serat": "1",
-        "total_porsi": ""
-      },
-      {
         "nama": "Porsi Besar",
-        "energi": "12",
-        "protein": "12",
-        "lemak": "12",
-        "karbohidrat": "12",
-        "serat": "12",
+        "energi": "75",
+        "protein": "86",
+        "lemak": "86",
+        "karbohidrat": "87",
+        "serat": "6",
         "total_porsi": ""
       }
     ],
