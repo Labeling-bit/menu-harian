@@ -170,7 +170,7 @@ footer{
 <main class="container">
 
 <section class="hero">
-  <div class="brand" id="brand"></div>
+  <div class="brand">SPPG Lamongan Sugio German 2</div>
   <div class="title">MENU</div>
   <div class="subtitle">Special Today's</div>
   <div class="date" id="dateText"></div>
@@ -220,10 +220,6 @@ function formatDate(s){
   return d.getDate()+" "+monthNames[d.getMonth()]+" "+d.getFullYear();
 }
 
-/* Ambil tanggal TERBARU dari data.js.
-   Jadi tidak peduli tanggal hari ini.
-   Kalau admin menambah 31 Agustus, otomatis 31 Agustus yang tampil.
-*/
 function getLatestDate(){
   const keys=Object.keys(menuData||{})
     .filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k))
@@ -232,11 +228,6 @@ function getLatestDate(){
 }
 
 function render(){
-  document.getElementById("brand").textContent =
-    (typeof siteInfo!=="undefined" && siteInfo.instansi)
-      ? siteInfo.instansi
-      : "";
-
   const dateString=getLatestDate();
   const dateText=document.getElementById("dateText");
 
@@ -253,19 +244,16 @@ function render(){
   const data=menuData[dateString];
   dateText.textContent=formatDate(dateString);
 
-  /* FOTO */
   if(data.photo){
     document.getElementById("photo").src=data.photo;
     document.getElementById("photoSection").style.display="block";
   }
 
-  /* MENU */
   const menu=Array.isArray(data.menu)?data.menu:[];
   document.getElementById("menuList").innerHTML=menu.length
     ? menu.map(item=>"<li>"+item+"</li>").join("")
     : "<li>Menu belum tersedia.</li>";
 
-  /* PILIHAN PORSI - hanya ditampilkan jika ada */
   const portions=Array.isArray(data.portions)?data.portions:[];
   if(portions.length){
     document.getElementById("portionSection").style.display="block";
@@ -278,7 +266,6 @@ function render(){
     `).join("");
   }
 
-  /* GIZI */
   const nutrition=Array.isArray(data.nutrition)?data.nutrition:[];
   if(!nutrition.length){
     document.getElementById("nutritionCards").innerHTML =
@@ -297,7 +284,6 @@ function render(){
     `).join("");
   }
 
-  /* BATAS KONSUMSI */
   document.getElementById("expiry").innerHTML =
     data.batas_konsumsi
       ? "<strong>Batas konsumsi:</strong> "+data.batas_konsumsi
