@@ -1,40 +1,23 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#f59e0b">
-  <title>Menu Hari Ini - SPPG Lamongan Sugio</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f6f0e6;
-      color: #172033;
-    }
-    .container { max-width: 900px; margin: auto; padding: 18px; }
-    .hero {
-      background: linear-gradient(135deg, #fffaf0, #f8dfb5);
-      border-radius: 24px;
-      padding: 26px 20px;
-      text-align: center;
-      box-shadow: 0 8px 25px rgba(0,0,0,.08);
-      border: 1px solid #ead8bc;
-    }
-    .brand { font-weight: 800; letter-spacing: .5px; color: #263449; }
-    .title { font-size: clamp(34px, 9vw, 64px); margin: 12px 0 0; font-weight: 900; }
-    .subtitle { color: #9b4a1e; font-size: clamp(26px, 7vw, 48px); font-weight: 800; font-style: italic; margin: 0 0 10px; }
-    .date { font-size: 20px; font-weight: 800; }
-    .badge {
-      display: inline-block; margin-top: 10px; padding: 8px 14px; border-radius: 999px;
-      background: #172033; color: white; font-size: 13px; font-weight: 700;
-    }
-    .section {
-      margin-top: 18px; background: white; border-radius: 20px; padding: 20px;
-      box-shadow: 0 6px 20px rgba(0,0,0,.06);
-    }
-    .section h2 { margin: 0 0 14px; font-size: 24px; }
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Menu Hari Ini</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f7f0e5;color:#15243b;font-family:Georgia,serif}.w{max-width:900px;margin:auto;padding:14px}.hero,.card{background:#fff;border-radius:22px;padding:20px;margin:14px 0;box-shadow:0 7px 24px #0001}.hero{text-align:center;background:linear-gradient(135deg,#fffaf0,#f9dfad)}.brand{font-size:20px;font-weight:bold}.title{font-size:62px;font-weight:900}.sub{font-size:42px;color:#a34c1d;font-style:italic}.date{font-size:23px;font-weight:bold}.badge{display:inline-block;background:#15243b;color:#fff;border-radius:99px;padding:10px 17px;margin-top:10px}.photo{width:100%;max-height:520px;object-fit:contain;border-radius:15px;background:#eee}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.nut{border:2px solid #efb43f;border-radius:18px;padding:15px;background:#fffaf0}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e8dcc7;font-size:17px}li{font-size:19px;margin:9px 0}.expiry{background:#fff1c9;border-left:6px solid #f59e0b;padding:15px;border-radius:12px}.controls{display:flex;gap:8px;flex-wrap:wrap}input,button{padding:11px;border-radius:10px;font-size:15px}button{border:0;background:#15243b;color:#fff;font-weight:bold}@media(max-width:650px){.grid{grid-template-columns:1fr}.title{font-size:50px}.sub{font-size:34px}}</style></head><body><main class="w">
+<section class="hero"><div class="brand" id="brand"></div><div class="title">MENU</div><div class="sub">Special Today's</div><div class="date" id="date"></div><div class="badge">MENU HARI INI • INFORMASI GIZI</div></section>
+<section class="card" id="pc" style="display:none"><h2>📷 Foto Menu Hari Ini</h2><img id="photo" class="photo"></section>
+<section class="card"><h2>🍽️ Menu</h2><ul id="menu"></ul></section>
+<section class="card"><h2>❤️ Informasi Gizi</h2><div class="grid" id="nutrition"></div></section>
+<section class="card"><h2>⏰ Batas Konsumsi</h2><div class="expiry" id="expiry"></div></section>
+<section class="card"><h2>🔎 Lihat Tanggal Lain</h2><div class="controls"><input type="date" id="picker"><button onclick="sel()">Tampilkan</button><button onclick="today()">Hari Ini</button></div></section>
+</main><script src="data.js"></script><script>
+const mn=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+function fmt(s){let d=new Date(s+"T00:00:00");return d.getDate()+" "+mn[d.getMonth()]+" "+d.getFullYear()}
+function td(){let d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function show(s){picker.value=s;brand.textContent=siteInfo.instansi;date.textContent=fmt(s);let x=menuData[s];
+if(!x){pc.style.display="none";menu.innerHTML="<li>Data menu belum tersedia untuk tanggal ini.</li>";nutrition.innerHTML="";expiry.textContent="Belum ada data.";return}
+if(x.photo){photo.src=x.photo;pc.style.display="block"}else pc.style.display="none";
+menu.innerHTML=x.menu.map(a=>"<li>"+a+"</li>").join("");
+nutrition.innerHTML=x.nutrition.map(n=>"<div class='nut'><h3>"+n.nama+"</h3><div class='row'><span>Energi</span><b>"+n.energi+"</b></div><div class='row'><span>Protein</span><b>"+n.protein+"</b></div><div class='row'><span>Lemak</span><b>"+n.lemak+"</b></div><div class='row'><span>Karbohidrat</span><b>"+n.karbohidrat+"</b></div><div class='row'><span>Serat</span><b>"+n.serat+"</b></div></div>").join("");
+expiry.innerHTML="<b>Batas konsumsi:</b> "+x.batas_konsumsi}
+function sel(){if(picker.value)show(picker.value)}function today(){show(td())}let initial=menuData[td()]?td():Object.keys(menuData)[0];show(initial);
+</script></body></html>    .section h2 { margin: 0 0 14px; font-size: 24px; }
     .menu-list { margin: 0; padding-left: 22px; line-height: 1.8; font-size: 17px; }
     .portions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
     .card {
