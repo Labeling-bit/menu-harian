@@ -27,10 +27,7 @@ body{margin:0;background:#f7f0e5;color:#15243b;font-family:Georgia,serif}
 .nutri{background:#f59e0b;color:white;border-radius:15px;padding:13px 8px;text-align:center;font-weight:800}
 .nutri small{display:block;font-weight:600;font-size:11px;margin-bottom:4px}
 .expiry{background:#fff4cf;border-left:6px solid #f59e0b;border-radius:14px;padding:15px;line-height:1.6;font-size:18px}
-.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-input[type="date"]{padding:11px 13px;border:1px solid #ccc;border-radius:10px;font-size:15px}
-button{border:0;border-radius:10px;padding:11px 15px;background:#172033;color:white;font-weight:700;cursor:pointer}
-.empty{text-align:center;padding:20px 10px;color:#667085}
+.empty{text-align:center;padding:25px 10px;color:#667085;font-size:18px}
 footer{text-align:center;padding:25px 10px;color:#667085;font-size:13px}
 @media(max-width:650px){
  .portions{grid-template-columns:1fr}
@@ -78,17 +75,8 @@ footer{text-align:center;padding:25px 10px;color:#667085;font-size:13px}
   <div class="expiry" id="expiry"></div>
 </section>
 
-<section class="section">
-  <h2>🔎 Lihat Tanggal Lain</h2>
-  <div class="controls">
-    <input type="date" id="datePicker">
-    <button onclick="loadSelectedDate()">Tampilkan</button>
-    <button onclick="loadToday()">Hari Ini</button>
-  </div>
-</section>
-
 <footer>
-  Informasi menu dan gizi • Silakan sesuaikan data dengan data resmi instansi.
+  Informasi menu dan gizi • Data ditampilkan hanya untuk menu terbaru.
 </footer>
 
 </main>
@@ -106,11 +94,6 @@ function formatDate(dateString){
  return `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-function todayLocal(){
- const d=new Date();
- return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-
 function esc(value){
  return String(value ?? "")
   .replaceAll("&","&amp;")
@@ -120,31 +103,33 @@ function esc(value){
   .replaceAll("'","&#039;");
 }
 
-function render(dateString){
- const data=menuData?.[dateString];
+function renderLatest(){
+ const dates=Object.keys(window.menuData || {}).filter(Boolean).sort();
 
- document.getElementById("datePicker").value=dateString;
- document.getElementById("brand").textContent=siteInfo?.instansi || "Menu Harian";
- document.getElementById("dateText").textContent=formatDate(dateString);
+ document.getElementById("brand").textContent =
+   window.siteInfo?.instansi || "Menu Harian";
 
- const menuList=document.getElementById("menuList");
- const portionSection=document.getElementById("portionSection");
- const portionCards=document.getElementById("portionCards");
- const nutritionCards=document.getElementById("nutritionCards");
- const expiry=document.getElementById("expiry");
- const photoSection=document.getElementById("photoSection");
- const photo=document.getElementById("photo");
-
- if(!data){
-   photoSection.style.display="none";
-   portionSection.style.display="none";
-   menuList.innerHTML='<li>Menu belum tersedia untuk tanggal ini.</li>';
-   nutritionCards.innerHTML='<div class="empty">Belum ada informasi gizi.</div>';
-   expiry.innerHTML='<strong>Menu belum tersedia.</strong><br>Belum ada data untuk '+esc(formatDate(dateString))+'.';
+ // WEBSITE UTAMA HANYA MENAMPILKAN DATA TERBARU.
+ // Data tanggal-tanggal lama tidak ditampilkan.
+ if(!dates.length){
+   document.getElementById("dateText").textContent="Belum ada menu";
+   document.getElementById("menuList").innerHTML=
+     '<li>Menu hari ini belum tersedia.</li>';
+   document.getElementById("nutritionCards").innerHTML=
+     '<div class="empty">Belum ada informasi gizi.</div>';
+   document.getElementById("expiry").innerHTML=
+     '<strong>Belum ada menu.</strong>';
    return;
  }
 
- // Foto bersifat opsional
+ const latestDate=dates[dates.length-1];
+ const data=window.menuData[latestDate];
+
+ document.getElementById("dateText").textContent=formatDate(latestDate);
+
+ const photoSection=document.getElementById("photoSection");
+ const photo=document.getElementById("photo");
+
  if(data.photo){
    photo.src=data.photo;
    photoSection.style.display="block";
@@ -153,35 +138,39 @@ function render(dateString){
    photoSection.style.display="none";
  }
 
- // Menu
  const menus=Array.isArray(data.menu)?data.menu:[];
- menuList.innerHTML=menus.length
+ document.getElementById("menuList").innerHTML=menus.length
    ? menus.map(item=>`<li>${esc(item)}</li>`).join("")
    : '<li>Belum ada menu.</li>';
 
- // Pilihan porsi bersifat opsional
  const portions=Array.isArray(data.portions)?data.portions:[];
+ const portionSection=document.getElementById("portionSection");
+ const portionCards=document.getElementById("portionCards");
+
  if(portions.length){
    portionSection.style.display="block";
    portionCards.innerHTML=portions.map(p=>`
      <div class="card">
        <h3>${esc(p.nama)}</h3>
        ${p.harga?`<div class="price">${esc(p.harga)}</div>`:""}
-       ${Array.isArray(p.items)?`<ul class="items">${p.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`:""}
+       ${Array.isArray(p.items)
+         ? `<ul class="items">${p.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`
+         : ""}
      </div>
    `).join("");
  }else{
    portionSection.style.display="none";
-   portionCards.innerHTML="";
  }
 
- // Informasi gizi
  const nutrition=Array.isArray(data.nutrition)?data.nutrition:[];
+ const nutritionCards=document.getElementById("nutritionCards");
+
  if(nutrition.length){
    nutritionCards.innerHTML=nutrition.map(n=>`
      <div class="card">
        <h3>${esc(n.nama)}</h3>
-       ${n.total_porsi!==undefined && n.total_porsi!=="" ? `<p><strong>Total porsi:</strong> ${esc(n.total_porsi)}</p>` : ""}
+       ${n.total_porsi!==undefined && n.total_porsi!==""
+         ? `<p><strong>Total porsi:</strong> ${esc(n.total_porsi)}</p>` : ""}
        <div class="nutrition">
          <div class="nutri"><small>ENERGI</small>${esc(n.energi)}</div>
          <div class="nutri"><small>PROTEIN</small>${esc(n.protein)}</div>
@@ -195,25 +184,13 @@ function render(dateString){
    nutritionCards.innerHTML='<div class="empty">Belum ada informasi gizi.</div>';
  }
 
- expiry.innerHTML=`<strong>Batas konsumsi:</strong> ${esc(data.batas_konsumsi || "Belum ada keterangan.")}`;
+ nutritionCards.dataset.date=latestDate;
+
+ document.getElementById("expiry").innerHTML=
+   `<strong>Batas konsumsi:</strong> ${esc(data.batas_konsumsi || "Belum ada keterangan.")}`;
 }
 
-function loadToday(){
- render(todayLocal());
-}
-
-function loadSelectedDate(){
- const value=document.getElementById("datePicker").value;
- if(value) render(value);
-}
-
-// Jika hari ini belum ada datanya, otomatis buka tanggal data terbaru.
-const dates=Object.keys(menuData||{}).sort();
-const initialDate=menuData?.[todayLocal()]
- ? todayLocal()
- : (dates.length ? dates[dates.length-1] : todayLocal());
-
-render(initialDate);
+renderLatest();
 </script>
 </body>
 </html>
