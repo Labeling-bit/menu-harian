@@ -1,94 +1,10 @@
-<!doctype html>
-<html lang="id">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Input Menu Harian</title>
-<style>
-*{box-sizing:border-box}:root{--navy:#15243b;--gold:#efb43f;--cream:#f7f0e5;--soft:#fffaf0;--muted:#667085}
-body{margin:0;background:var(--cream);color:var(--navy);font-family:Georgia,serif}.container{max-width:850px;margin:auto;padding:16px}
-.hero,.section{background:#fff;border-radius:24px;padding:22px;margin:14px 0;box-shadow:0 7px 24px #0001}.hero{text-align:center;background:linear-gradient(135deg,#fffaf0,#f9dfad)}
-.brand{font-size:20px;font-weight:bold}h1{font-size:40px;margin:5px 0}.subtitle{font-size:21px;color:#a34c1d;font-style:italic}
-h2{font-size:25px;margin:0 0 18px}h3{margin:0 0 10px}label{display:block;font-weight:bold;font-size:17px;margin:14px 0 7px}
-input[type=date],input[type=text],textarea{width:100%;padding:13px;border:1px solid #ccc;border-radius:12px;font:16px Georgia,serif;background:#fff}
-textarea{min-height:125px;resize:vertical;line-height:1.6}.help{color:var(--muted);font-size:14px;line-height:1.5}
-.filebox{border:2px dashed #d7b35a;border-radius:16px;padding:18px;background:var(--soft);text-align:center}input[type=file]{width:100%;font-size:15px}
-.preview{display:none;margin-top:14px}.preview img{width:100%;max-height:500px;object-fit:contain;border-radius:15px;background:#eee}
-.nutrition-card{border:2px solid var(--gold);border-radius:18px;padding:16px;background:var(--soft);margin-top:12px}.nut-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.remove{background:#fff;color:#a33;border:1px solid #d99;border-radius:10px;padding:8px 11px}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}button{border:0;border-radius:12px;padding:14px 16px;background:var(--navy);color:#fff;font:bold 16px Georgia,serif;cursor:pointer}
-button.secondary{background:#e9e0d2;color:var(--navy)}button.gold{background:#d99a17}.status{display:none;border-radius:14px;padding:14px;margin-top:14px;line-height:1.5}
-.status.ok{display:block;background:#e9f7e9;border-left:6px solid #3b8d45}.status.err{display:block;background:#fff0f0;border-left:6px solid #b33}
-.notice{background:#fff1c9;border-left:6px solid #f59e0b;border-radius:12px;padding:14px;line-height:1.5}
-@media(max-width:600px){.container{padding:10px}.hero,.section{padding:18px;margin:10px 0}.row,.actions{grid-template-columns:1fr}h1{font-size:34px}}
-</style></head>
-<body><main class="container">
-<section class="hero"><div class="brand">SPPG Lamongan Sugio Gergam 2</div><h1>Input Menu Harian</h1><div class="subtitle">Menu tersimpan berdasarkan tanggal</div><p class="help">Setiap kali membuat data baru, data tanggal lama tetap dipertahankan. Anda hanya perlu mengganti <b>data.js</b> di GitHub.</p></section>
-
-<section class="section"><h2>📅 1. Tanggal Menu</h2><label>Tanggal</label><input type="date" id="date"></section>
-
-<section class="section"><h2>📷 2. Foto Menu</h2><div class="filebox"><input type="file" id="photoFile" accept="image/*"><div class="help">Foto otomatis diperkecil agar lebih ringan.</div><div class="preview" id="preview"><img id="previewImg"></div></div></section>
-
-<section class="section"><h2>🍽️ 3. Isi Menu</h2><label>Daftar menu</label><textarea id="menuText" placeholder="Satu menu satu baris&#10;Nasi putih&#10;Ayam goreng&#10;Tempe goreng&#10;Sayur&#10;Buah"></textarea></section>
-
-<section class="section"><h2>❤️ 4. Informasi Gizi</h2><div id="nutritionList"></div><button type="button" class="secondary" onclick="addNutrition()">＋ Tambah data gizi</button></section>
-
-<section class="section"><h2>⏰ 5. Batas Konsumsi</h2><label>Keterangan</label><input type="text" id="expiry" placeholder="Contoh: 30 Agustus 2026, pukul 12.00"></section>
-
-<section class="section"><h2>💾 6. Simpan Menu</h2><div class="notice"><b>Penting:</b> file yang didownload akan berisi <b>semua tanggal yang sudah ada</b> + tanggal baru. Jadi menu lama tidak hilang.</div>
-<div class="actions"><button type="button" class="secondary" onclick="previewData()">👁️ Cek Data</button><button type="button" class="gold" onclick="downloadData()">⬇️ Download data.js</button></div><div id="status" class="status"></div></section>
-
-<section class="section"><h2>📌 Setelah Download</h2><ol style="line-height:1.8;padding-left:22px"><li>Download <b>data.js</b>.</li><li>Masuk ke GitHub repository.</li><li>Ganti file <b>data.js</b> lama dengan file baru.</li><li>Tekan <b>Commit changes</b>.</li><li>Tunggu beberapa menit.</li><li>Website utama akan memiliki tanggal baru, sedangkan tanggal lama tetap bisa dipilih.</li></ol></section>
-</main>
-<script>
-let photoData="";let nutritionCount=0;
-function todayLocal(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
-document.getElementById("date").value=todayLocal();
-
-function addNutrition(v={}){
- nutritionCount++;const id=nutritionCount;const el=document.createElement("div");el.className="nutrition-card";el.id="nut-"+id;
- el.innerHTML=`<div class="nut-head"><h3>Data Gizi ${id}</h3><button type="button" class="remove" onclick="this.closest('.nutrition-card').remove()">Hapus</button></div>
- <label>Nama / porsi</label><input type="text" class="n-nama" placeholder="Contoh: Porsi Besar" value="${esc(v.nama||"Porsi Besar")}">
- <div class="row">
- <div><label>Energi</label><input type="text" class="n-energi" placeholder="646 kkal" value="${esc(v.energi||"")}"></div>
- <div><label>Protein</label><input type="text" class="n-protein" placeholder="24 gr" value="${esc(v.protein||"")}"></div>
- <div><label>Lemak</label><input type="text" class="n-lemak" placeholder="21 gr" value="${esc(v.lemak||"")}"></div>
- <div><label>Karbohidrat</label><input type="text" class="n-karbo" placeholder="87 gr" value="${esc(v.karbohidrat||"")}"></div>
- <div><label>Serat</label><input type="text" class="n-serat" placeholder="3 gr" value="${esc(v.serat||"")}"></div>
- <div><label>Total porsi (opsional)</label><input type="text" class="n-total" placeholder="100 porsi" value="${esc(v.total_porsi||"")}"></div></div>`;
- document.getElementById("nutritionList").appendChild(el);
-}
-addNutrition();
-
-document.getElementById("photoFile").addEventListener("change",function(){
- const file=this.files[0];if(!file)return;const r=new FileReader();
- r.onload=e=>{const im=new Image();im.onload=()=>{let max=1200,w=im.width,h=im.height;if(w>max||h>max){if(w>h){h=Math.round(h*max/w);w=max}else{w=Math.round(w*max/h);h=max}}
- const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);photoData=c.toDataURL("image/jpeg",.78);
- document.getElementById("previewImg").src=photoData;document.getElementById("preview").style.display="block";setStatus("Foto siap digunakan.","ok")};im.src=e.target.result};r.readAsDataURL(file);
-});
-
-function collect(){
- const date=document.getElementById("date").value;if(!date)throw Error("Tanggal belum diisi.");
- const menu=document.getElementById("menuText").value.split("\n").map(x=>x.trim()).filter(Boolean);if(!menu.length)throw Error("Isi menu belum diisi.");
- const cards=[...document.querySelectorAll(".nutrition-card")];if(!cards.length)throw Error("Minimal satu data gizi.");
- const nutrition=cards.map(c=>({nama:c.querySelector(".n-nama").value.trim()||"Informasi Gizi",energi:c.querySelector(".n-energi").value.trim(),protein:c.querySelector(".n-protein").value.trim(),lemak:c.querySelector(".n-lemak").value.trim(),karbohidrat:c.querySelector(".n-karbo").value.trim(),serat:c.querySelector(".n-serat").value.trim(),total_porsi:c.querySelector(".n-total").value.trim()}));
- return {date,entry:{photo:photoData,menu,nutrition,batas_konsumsi:document.getElementById("expiry").value.trim()||"Belum ada informasi."}};
-}
-function previewData(){try{const x=collect();setStatus("Data siap: "+x.date+" • "+x.entry.menu.length+" menu • "+x.entry.nutrition.length+" data gizi • Foto: "+(x.entry.photo?"Ya":"Tidak"),"ok")}catch(e){setStatus(e.message,"err")}}
-
-function downloadData(){
- try{
-  const x=collect();
-  // Meminta data lama yang sudah tersimpan pada browser bila ada.
-  // Jika browser belum pernah menyimpan data lama, data baru tetap dibuat normal.
-  let old={};try{old=JSON.parse(localStorage.getItem("menuDataArchive")||"{}")}catch(e){}
-  old[x.date]=x.entry;
-  const obj={siteInfo:{instansi:"SPPG Lamongan Sugio Gergam 2"},menuData:old};
-  const text="const siteInfo = "+JSON.stringify(obj.siteInfo,null,2)+";\\n\\nconst menuData = "+JSON.stringify(obj.menuData,null,2)+";\\n";
-  const blob=new Blob([text],{type:"application/javascript;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="data.js";document.body.appendChild(a);a.click();a.remove();
-  localStorage.setItem("menuDataArchive",JSON.stringify(old));
-  setStatus("data.js berhasil dibuat. Data tanggal "+x.date+" ditambahkan. Upload file ini ke GitHub untuk memperbarui website.","ok");
- }catch(e){setStatus(e.message,"err")}
-}
-function setStatus(t,type){const e=document.getElementById("status");e.className="status "+type;e.innerHTML=t}
-function esc(v){return String(v).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Input Menu Harian</title><style>
+body{margin:0;background:#f7f0e5;color:#15243b;font-family:Arial,sans-serif}main{max-width:760px;margin:auto;padding:15px}.c{background:#fff;border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 5px 18px #0001}label{display:block;font-weight:bold;margin:12px 0 5px}input,textarea{width:100%;padding:11px;border:1px solid #ccd1d8;border-radius:9px;font-size:16px;box-sizing:border-box}textarea{min-height:100px}.g{display:grid;grid-template-columns:1fr 1fr;gap:15px}button{padding:12px 16px;border:0;border-radius:10px;background:#15243b;color:white;font-weight:bold;margin-top:15px}.hint{color:#667085;line-height:1.5;font-size:14px}.prev{max-width:100%;max-height:350px;margin-top:10px;border-radius:10px}@media(max-width:600px){.g{grid-template-columns:1fr}}</style></head><body><main>
+<section class="c"><h1>📝 Input Menu Harian</h1><b>SPPG Lamongan Sugio Gergam 2</b><p class="hint">Isi formulir ini. Foto akan diperkecil otomatis. Tombol di bawah membuat file <b>data.js</b>; file tersebut kemudian di-upload ke GitHub. Tidak perlu mengetik kode.</p></section>
+<section class="c"><h2>1. Menu</h2><label>Tanggal</label><input type="date" id="d"><label>Foto menu</label><input type="file" id="f" accept="image/*"><img id="p" class="prev" style="display:none"><label>Menu (satu item per baris)</label><textarea id="m" placeholder="Nasi putih&#10;Ayam goreng&#10;Sayur&#10;Buah"></textarea><label>Batas konsumsi</label><input id="b" placeholder="29 Agustus 2026, pukul 12.00"></section>
+<section class="c"><h2>2. Gizi</h2><div class="g"><div><h3>Porsi Besar</h3><label>Energi</label><input id="be"><label>Protein</label><input id="bp"><label>Lemak</label><input id="bl"><label>Karbohidrat</label><input id="bk"><label>Serat</label><input id="bs"></div><div><h3>Porsi Kecil</h3><label>Energi</label><input id="ke"><label>Protein</label><input id="kp"><label>Lemak</label><input id="kl"><label>Karbohidrat</label><input id="kk"><label>Serat</label><input id="ks"></div></div><button onclick="make()">⬇️ Buat data.js</button><p id="ok" class="hint"></p></section>
+<section class="c"><h2>3. Upload ke GitHub</h2><p class="hint">Setelah <b>data.js</b> terdownload, buka repository GitHub → klik file <b>data.js</b> → edit/upload penggantinya → <b>Commit changes</b>. Website utama akan berubah setelah GitHub Pages selesai deploy.</p></section>
+</main><script>
+let imgData="";f.onchange=()=>{let r=new FileReader();r.onload=e=>{let im=new Image();im.onload=()=>{let s=Math.min(1,1200/im.width,1200/im.height),c=document.createElement("canvas");c.width=im.width*s;c.height=im.height*s;c.getContext("2d").drawImage(im,0,0,c.width,c.height);imgData=c.toDataURL("image/jpeg",.78);p.src=imgData;p.style.display="block"};im.src=e.target.result};r.readAsDataURL(f.files[0])};
+function q(id){return document.getElementById(id).value.trim()}function make(){if(!q("d")||!q("m")||!imgData){alert("Tanggal, menu, dan foto wajib diisi.");return}let o={};o[q("d")]={photo:imgData,menu:q("m").split(/\n/).map(x=>x.trim()).filter(Boolean),nutrition:[{nama:"PORSI BESAR",energi:q("be"),protein:q("bp"),lemak:q("bl"),karbohidrat:q("bk"),serat:q("bs")},{nama:"PORSI KECIL",energi:q("ke"),protein:q("kp"),lemak:q("kl"),karbohidrat:q("kk"),serat:q("ks")}],batas_konsumsi:q("b")};let t="const siteInfo = { instansi: 'SPPG Lamongan Sugio Gergam 2' };\nconst menuData = "+JSON.stringify(o,null,2)+";\n",blob=new Blob([t],{type:"text/javascript"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="data.js";a.click();ok.textContent="Berhasil. Sekarang upload data.js hasil download ke GitHub."}
 </script></body></html>
