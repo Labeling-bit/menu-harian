@@ -12,7 +12,11 @@ h1,h2,h3{margin-top:0}
 label{display:block;font-weight:bold;margin:12px 0 5px}
 input,textarea{width:100%;padding:11px;border:1px solid #ccd1d8;border-radius:9px;font-size:16px;box-sizing:border-box}
 textarea{min-height:100px}
+
 .g{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.portion-box{border:1px solid #e1e5ea;border-radius:14px;padding:16px;background:#fafafa}
+select{width:100%;padding:11px;border:1px solid #ccd1d8;border-radius:9px;font-size:16px;box-sizing:border-box;background:#fff;color:#15243b}
+
 button{padding:13px 18px;border:0;border-radius:10px;background:#15243b;color:white;font-weight:bold;margin-top:15px;font-size:15px}
 button:disabled{opacity:.55}
 .hint{color:#667085;line-height:1.5;font-size:14px}
@@ -73,29 +77,52 @@ Buah"></textarea>
 </section>
 
 <section class="c">
-<h2>2. Gizi</h2>
+  <h2>2. Gizi</h2>
 
-<div class="g">
-<div>
-<h3>Porsi Besar</h3>
-<label>Energi</label><input id="be" placeholder="kkal">
-<label>Protein</label><input id="bp" placeholder="gram">
-<label>Lemak</label><input id="bl" placeholder="gram">
-<label>Karbohidrat</label><input id="bk" placeholder="gram">
-<label>Serat</label><input id="bs" placeholder="gram">
-</div>
+  <p class="hint">
+    Tetap ada <b>2 kotak gizi</b> seperti sebelumnya. Pada setiap kotak,
+    Anda bisa memilih jenis porsi yang akan diisi.
+  </p>
 
-<div>
-<h3>Porsi Kecil</h3>
-<label>Energi</label><input id="ke" placeholder="kkal">
-<label>Protein</label><input id="kp" placeholder="gram">
-<label>Lemak</label><input id="kl" placeholder="gram">
-<label>Karbohidrat</label><input id="kk" placeholder="gram">
-<label>Serat</label><input id="ks" placeholder="gram">
-</div>
-</div>
+  <div class="g">
+    <div class="portion-box">
+      
+      <label>Jenis Porsi</label>
+      <select id="p1nama">
+        <option value="PORSI KECIL">Porsi Kecil</option>
+        <option value="PORSI BESAR">Porsi Besar</option>
+        <option value="BUMIL">Bumil</option>
+        <option value="BALITA">Balita</option>
+        <option value="BUSUI">Busui</option>
+      </select>
 
-<button id="save" onclick="saveToGitHub()">💾 SIMPAN MENU KE WEBSITE</button>
+      <label>Energi</label><input id="p1e" placeholder="kkal">
+      <label>Protein</label><input id="p1p" placeholder="gram">
+      <label>Lemak</label><input id="p1l" placeholder="gram">
+      <label>Karbohidrat</label><input id="p1k" placeholder="gram">
+      <label>Serat</label><input id="p1s" placeholder="gram">
+    </div>
+
+    <div class="portion-box">
+      
+      <label>Jenis Porsi</label>
+      <select id="p2nama">
+        <option value="PORSI BESAR">Porsi Besar</option>
+        <option value="PORSI KECIL">Porsi Kecil</option>
+        <option value="BUMIL">Bumil</option>
+        <option value="BALITA">Balita</option>
+        <option value="BUSUI">Busui</option>
+      </select>
+
+      <label>Energi</label><input id="p2e" placeholder="kkal">
+      <label>Protein</label><input id="p2p" placeholder="gram">
+      <label>Lemak</label><input id="p2l" placeholder="gram">
+      <label>Karbohidrat</label><input id="p2k" placeholder="gram">
+      <label>Serat</label><input id="p2s" placeholder="gram">
+    </div>
+  </div>
+
+  <button id="save" onclick="saveToGitHub()">💾 SIMPAN MENU KE WEBSITE</button>
 <p id="ok" class="hint"></p>
 </section>
 
@@ -309,20 +336,20 @@ async function saveToGitHub(){
 
       nutrition: [
         {
-          nama: "PORSI BESAR",
-          energi: q("be"),
-          protein: q("bp"),
-          lemak: q("bl"),
-          karbohidrat: q("bk"),
-          serat: q("bs")
+          nama: q("p1nama"),
+          energi: q("p1e"),
+          protein: q("p1p"),
+          lemak: q("p1l"),
+          karbohidrat: q("p1k"),
+          serat: q("p1s")
         },
         {
-          nama: "PORSI KECIL",
-          energi: q("ke"),
-          protein: q("kp"),
-          lemak: q("kl"),
-          karbohidrat: q("kk"),
-          serat: q("ks")
+          nama: q("p2nama"),
+          energi: q("p2e"),
+          protein: q("p2p"),
+          lemak: q("p2l"),
+          karbohidrat: q("p2k"),
+          serat: q("p2s")
         }
       ],
 
