@@ -39,11 +39,20 @@ body{
 }
 
 .site-header{
+  position:relative;
+  z-index:5;
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:flex-start;
-  min-height:108px;
-  padding:8px 8px 4px;
+  min-height:0;
+  height:0;
+  padding:0;
+}
+
+.site-header .bgn-logo{
+  position:absolute;
+  left:22px;
+  top:22px;
 }
 
 .bgn-logo{
@@ -55,22 +64,25 @@ body{
 }
 
 .hero,.section{
-  background:rgba(255,255,255,.94);
+  background:rgba(255,255,255,.96);
   border-radius:30px;
   padding:26px;
   margin:16px 0;
-  box-shadow:0 10px 28px rgba(11,43,91,.09);
-  border:1px solid rgba(255,255,255,.75);
+  box-shadow:0 12px 30px rgba(11,43,91,.10);
+  border:1px solid rgba(255,255,255,.9);
 }
 
 .hero{
+  position:relative;
   text-align:center;
+  padding-top:34px;
   background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(232,247,255,.95));
   animation:heroEnter 1s cubic-bezier(.22,1,.36,1) both;
 }
 
 .brand{
   font-size:25px;
+  letter-spacing:.2px;
   line-height:1.25;
   font-weight:800;
   margin-bottom:12px;
@@ -78,7 +90,7 @@ body{
 }
 
 .title{
-  font-size:72px;
+  font-size:64px;
   line-height:1;
   font-weight:900;
   margin:10px 0 14px;
@@ -238,8 +250,8 @@ footer{text-align:center;padding:25px 10px;color:var(--muted);font-size:14px}
 
 @media(max-width:650px){
   .container{padding:10px}
-  .site-header{min-height:96px;padding:4px 6px}
-  .bgn-logo{width:88px;height:88px}
+  .site-header{min-height:0;height:0;padding:0}
+  .bgn-logo{width:78px;height:78px}
   .hero,.section{padding:20px;border-radius:26px}
   .brand{font-size:22px}
   .title{font-size:54px}
@@ -250,32 +262,96 @@ footer{text-align:center;padding:25px 10px;color:var(--muted);font-size:14px}
   .card-grid,.nutrition-grid{grid-template-columns:1fr}
 }
 
- .menu-group-section .group-block{margin-bottom:36px}
+ .menu-group-section .group-block{
+  margin-bottom:30px;
+  padding:0;
+}
 .menu-group-section .group-block:last-child{margin-bottom:0}
-.menu-group-title{margin:0 0 14px;font-size:27px}
-.menu-group-layout{display:flex;flex-direction:column;gap:16px}
-.menu-photo-box{background:rgba(255,255,255,.72);border-radius:20px;padding:14px}
-.menu-photo-box img{width:100%;max-height:650px;display:block;border-radius:16px;object-fit:contain;background:#eef7fb}
-.group-menu-box,.group-nutrition-box{background:rgba(255,255,255,.94);border-radius:24px;padding:22px;border:1px solid rgba(255,255,255,.8);box-shadow:0 7px 20px rgba(11,43,91,.06)}
-.group-menu-box h2,.group-nutrition-box h2{margin:0 0 16px;font-size:32px}
-.group-menu-list{margin:0;padding-left:30px}
-.group-menu-list li{margin:7px 0;font-size:21px;line-height:1.6}
+.menu-group-title{
+  margin:0 0 14px;
+  font-size:31px;
+  font-weight:900;
+  letter-spacing:.2px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.menu-group-layout{display:flex;flex-direction:column;gap:14px}
+.menu-photo-box{
+  background:linear-gradient(145deg,#fafdff,#edf8ff);
+  border-radius:22px;
+  padding:10px;
+  border:1px solid #c8e7f8;
+  box-shadow:0 6px 16px rgba(11,43,91,.05);
+}
+.menu-photo-box img{
+  width:100%;
+  max-height:560px;
+  display:block;
+  border-radius:17px;
+  object-fit:cover;
+  background:#eef7fb;
+}
+.group-menu-box,.group-nutrition-box{
+  background:rgba(255,255,255,.98);
+  border-radius:22px;
+  padding:20px;
+  border:1.5px solid #a9d9f4;
+  box-shadow:0 7px 20px rgba(11,43,91,.06);
+}
+.group-menu-box{
+  position:relative;
+  overflow:hidden;
+}
+.group-menu-box:after{
+  content:'🍽️';
+  position:absolute;
+  right:22px;
+  bottom:10px;
+  font-size:64px;
+  opacity:.08;
+}
+.group-menu-box h2,.group-nutrition-box h2{margin:0 0 14px;font-size:30px}
+.group-menu-list{
+  margin:0;
+  padding-left:28px;
+  columns:2;
+  column-gap:50px;
+}
+.group-menu-list li{margin:5px 0;font-size:20px;line-height:1.55;break-inside:avoid}
+.group-nutrition-box{
+  background:linear-gradient(145deg,#ffffff,#f7fcff);
+}
+.group-nutrition-box h2{display:flex;align-items:center;gap:5px}
 .group-nutrition-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.group-nutrition-card{padding:17px;border-radius:18px;min-width:0}
-.group-nutrition-card h4{margin:0 0 12px;font-size:20px}
-.group-nutrition-card .nut-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(21,36,59,.10);font-size:18px}
+.group-nutrition-card{
+  padding:15px;
+  border-radius:18px;
+  min-width:0;
+  border:1.5px solid #b7def2;
+  background:linear-gradient(145deg,#f8fcff,#edf8ff);
+}
+.group-nutrition-card:nth-child(2n){
+  background:linear-gradient(145deg,#fbfffb,#eef9f0);
+  border-color:#c5e4cf;
+}
+.group-nutrition-card h4{margin:0 0 10px;font-size:20px;color:var(--navy)}
+.group-nutrition-card .nut-row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(21,36,59,.13);font-size:17px}
 .group-nutrition-card .nut-row:last-child{border-bottom:0}
-.group-nutrition-card .total{font-size:16px}
+.group-nutrition-card .total{font-size:15px}
 @media(max-width:650px){
-  .menu-group-section .group-block{margin-bottom:28px}
-  .menu-group-title{font-size:24px}
-  .group-menu-box,.group-nutrition-box{padding:18px}
-  .group-menu-box h2,.group-nutrition-box h2{font-size:28px}
-  .group-nutrition-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .group-nutrition-card{padding:11px}
-  .group-nutrition-card h4{font-size:15px}
-  .group-nutrition-card .nut-row{font-size:13px;gap:4px;padding:8px 0;flex-direction:column;align-items:flex-start}
+  .site-header .bgn-logo{left:10px;top:14px;width:72px;height:72px}
+  .hero{padding-top:30px}
+  .menu-group-section .group-block{margin-bottom:25px}
+  .menu-group-title{font-size:25px}
+  .group-menu-box,.group-nutrition-box{padding:17px}
+  .group-menu-box h2,.group-nutrition-box h2{font-size:27px}
+  .group-menu-list{columns:1;padding-left:27px}
   .group-menu-list li{font-size:19px}
+  .group-nutrition-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .group-nutrition-card{padding:10px}
+  .group-nutrition-card h4{font-size:14px;line-height:1.2}
+  .group-nutrition-card .nut-row{font-size:12px;gap:3px;padding:7px 0}
 }
 </style>
 </head>
@@ -289,7 +365,7 @@ footer{text-align:center;padding:25px 10px;color:var(--muted);font-size:14px}
 
 <section class="hero">
   <div class="brand">SPPG Lamongan Sugio German 2</div>
-  <div class="title">MENU</div>
+  <div class="title">MENU HARI INI</div>
   <div class="subtitle">Special Today's</div>
   <div class="date" id="dateText"></div>
   <div class="badge">MENU HARI INI • INFORMASI GIZI</div>
@@ -369,10 +445,10 @@ function renderNutritionCard(n,index){
 function renderMenuGroup(group,index){
   const menu=Array.isArray(group.menu)?group.menu:[];
   const nutrition=Array.isArray(group.nutrition)?group.nutrition:[];
-  const menuLabel=`Menu ${index+1}`;
+  const menuLabel=`Foto menu 📷`;
   return `
     <div class="group-block scroll-animate">
-      <h2 class="menu-group-title">${escapeHtml(menuLabel)}</h2>
+      <h2 class="menu-group-title">📷 Foto menu</h2>
       <div class="menu-group-layout">
         <div class="menu-photo-box">
           ${group.photo?`<img src="${group.photo}" alt="Foto ${escapeHtml(menuLabel)}">`:""}
