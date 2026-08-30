@@ -148,7 +148,13 @@ h2{
 .price{font-weight:800;font-size:19px;margin-bottom:10px}
 .items{margin:0;padding-left:22px}
 .items li{font-size:18px;line-height:1.55;margin:5px 0}
-.nutrition-card{margin-bottom:14px}
+.nutrition-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+}
+
+.nutrition-card{margin-bottom:0;min-width:0}
 .total{margin:0 0 14px;font-size:17px}
 
 .nut-row{
@@ -241,8 +247,31 @@ footer{text-align:center;padding:25px 10px;color:var(--muted);font-size:14px}
   .date{font-size:23px}
   .badge{font-size:17px;padding:15px 18px}
   h2{font-size:29px}
-  .card-grid{grid-template-columns:1fr}
+  .card-grid,.nutrition-grid{grid-template-columns:1fr}
 }
+
+.menu-group-section .group-block{margin-bottom:28px}
+.menu-group-section .group-block:last-child{margin-bottom:0}
+.menu-group-title{margin:0 0 16px}
+.menu-group-layout{display:flex;flex-direction:column;gap:14px}
+.menu-photo-box,.group-nutrition-box,.group-menu-box{background:rgba(255,255,255,.72);border-radius:20px;padding:14px}
+.menu-photo-box img{width:100%;max-height:650px;display:block;border-radius:16px;object-fit:contain;background:#eef7fb}
+.group-menu-list{margin:0;padding-left:24px}
+.group-menu-list li{margin:7px 0;font-size:18px;line-height:1.5}
+.group-nutrition-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.group-nutrition-card{padding:16px;border-radius:16px;min-width:0}
+.group-nutrition-card h4{margin:0 0 12px;font-size:19px}
+.group-nutrition-card .nut-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(21,36,59,.10)}
+.group-nutrition-card .nut-row:last-child{border-bottom:0}
+@media(max-width:650px){
+  .group-nutrition-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .group-nutrition-box{padding:10px}
+  .group-nutrition-card{padding:11px}
+  .group-nutrition-card h4{font-size:15px}
+  .group-nutrition-card .nut-row{font-size:13px;gap:5px;flex-direction:column;align-items:flex-start}
+  .group-menu-list li{font-size:17px}
+}
+
 </style>
 </head>
 
@@ -261,24 +290,23 @@ footer{text-align:center;padding:25px 10px;color:var(--muted);font-size:14px}
   <div class="badge">MENU HARI INI • INFORMASI GIZI</div>
 </section>
 
-<section class="section scroll-animate photo-section-animate" id="photoSection" style="display:none">
-  <h2>📷 Foto Menu</h2>
-  <img id="photo" class="photo" alt="Foto menu">
+<section class="section scroll-animate menu-group-section" id="menuGroupsSection" style="display:none">
+  <div id="menuGroups"></div>
 </section>
 
-<section class="section scroll-animate">
+<section class="section scroll-animate" id="legacySection" style="display:none">
   <h2>🍽️ Menu</h2>
   <ul class="menu-list" id="menuList"></ul>
+</section>
+
+<section class="section scroll-animate" id="legacyNutritionSection" style="display:none">
+  <h2>❤️ Informasi Gizi</h2>
+  <div class="nutrition-grid" id="nutritionCards"></div>
 </section>
 
 <section class="section scroll-animate" id="portionSection" style="display:none">
   <h2>🥗 Pilihan Porsi</h2>
   <div class="card-grid" id="portionCards"></div>
-</section>
-
-<section class="section scroll-animate">
-  <h2>❤️ Informasi Gizi</h2>
-  <div id="nutritionCards"></div>
 </section>
 
 <section class="section scroll-animate one-way-animation">
@@ -311,16 +339,58 @@ function getLatestDate(){
   return keys.length ? keys[keys.length-1] : null;
 }
 
+function escapeHtml(value){
+  return String(value??"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function renderNutritionCard(n,index){
+  return `
+    <div class="nutrition-card group-nutrition-card stagger-card" style="transition-delay:${index*100}ms">
+      <h4>${escapeHtml(n.nama||"Informasi Gizi")}</h4>
+      ${n.total_porsi?`<p class="total"><strong>Total porsi:</strong> ${escapeHtml(n.total_porsi)}</p>`:""}
+      <div class="nut-row"><span>Energi</span><strong>${escapeHtml(n.energi||"-")}</strong></div>
+      <div class="nut-row"><span>Protein</span><strong>${escapeHtml(n.protein||"-")}</strong></div>
+      <div class="nut-row"><span>Lemak</span><strong>${escapeHtml(n.lemak||"-")}</strong></div>
+      <div class="nut-row"><span>Karbohidrat</span><strong>${escapeHtml(n.karbohidrat||"-")}</strong></div>
+      <div class="nut-row"><span>Serat</span><strong>${escapeHtml(n.serat||"-")}</strong></div>
+    </div>`;
+}
+
+function renderMenuGroup(group,index){
+  const menu=Array.isArray(group.menu)?group.menu:[];
+  const nutrition=Array.isArray(group.nutrition)?group.nutrition:[];
+  return `
+    <div class="group-block scroll-animate">
+      <h2 class="menu-group-title">${escapeHtml(group.nama||("Menu "+(index+1)))}</h2>
+      <div class="menu-group-layout">
+        <div class="menu-photo-box">
+          ${group.photo?`<img src="${group.photo}" alt="Foto menu ${index+1}">`:""}
+        </div>
+        <div class="group-nutrition-box">
+          <div class="group-nutrition-grid">
+            ${nutrition.map((n,i)=>renderNutritionCard(n,i)).join("")}
+          </div>
+        </div>
+        ${menu.length?`<div class="group-menu-box"><ul class="group-menu-list">${menu.map(item=>`<li>${escapeHtml(item)}</li>`).join("")}</ul></div>`:""}
+      </div>
+    </div>`;
+}
+
 function render(){
   const dateString=getLatestDate();
   const dateText=document.getElementById("dateText");
 
   if(!dateString){
     dateText.textContent="";
-    document.getElementById("menuList").innerHTML =
-      "<li>Belum ada data menu.</li>";
-    document.getElementById("nutritionCards").innerHTML =
-      '<div class="empty">Belum ada informasi gizi.</div>';
+    document.getElementById("menuGroupsSection").style.display="none";
+    document.getElementById("legacySection").style.display="none";
+    document.getElementById("legacyNutritionSection").style.display="none";
+    document.getElementById("portionSection").style.display="none";
     document.getElementById("expiry").textContent="Belum ada menu.";
     return;
   }
@@ -328,49 +398,50 @@ function render(){
   const data=menuData[dateString];
   dateText.textContent=formatDate(dateString);
 
-  if(data.photo){
-    document.getElementById("photo").src=data.photo;
-    document.getElementById("photoSection").style.display="block";
-  }
+  const groups=Array.isArray(data.menu_groups)?data.menu_groups:[];
 
-  const menu=Array.isArray(data.menu)?data.menu:[];
-  document.getElementById("menuList").innerHTML=menu.length
-    ? menu.map(item=>"<li>"+item+"</li>").join("")
-    : "<li>Menu belum tersedia.</li>";
-
-  const portions=Array.isArray(data.portions)?data.portions:[];
-  if(portions.length){
-    document.getElementById("portionSection").style.display="block";
-    document.getElementById("portionCards").innerHTML=portions.map((p,index)=>`
-      <div class="small-card stagger-card" style="transition-delay:${index*100}ms">
-        <h3>${p.nama||"Porsi"}</h3>
-        ${p.harga?`<div class="price">${p.harga}</div>`:""}
-        ${Array.isArray(p.items)?`<ul class="items">${p.items.map(i=>`<li>${i}</li>`).join("")}</ul>`:""}
-      </div>
-    `).join("");
-  }
-
-  const nutrition=Array.isArray(data.nutrition)?data.nutrition:[];
-  if(!nutrition.length){
-    document.getElementById("nutritionCards").innerHTML =
-      '<div class="empty">Belum ada informasi gizi.</div>';
+  if(groups.length){
+    document.getElementById("menuGroupsSection").style.display="block";
+    document.getElementById("menuGroups").innerHTML=groups.map(renderMenuGroup).join("");
+    document.getElementById("legacySection").style.display="none";
+    document.getElementById("legacyNutritionSection").style.display="none";
   }else{
-    document.getElementById("nutritionCards").innerHTML=nutrition.map((n,index)=>`
-      <div class="nutrition-card stagger-card" style="transition-delay:${index*100}ms">
-        <h3>${n.nama||"Informasi Gizi"}</h3>
-        ${n.total_porsi?`<p class="total"><strong>Total porsi:</strong> ${n.total_porsi}</p>`:""}
-        <div class="nut-row"><span>Energi</span><strong>${n.energi||"-"}</strong></div>
-        <div class="nut-row"><span>Protein</span><strong>${n.protein||"-"}</strong></div>
-        <div class="nut-row"><span>Lemak</span><strong>${n.lemak||"-"}</strong></div>
-        <div class="nut-row"><span>Karbohidrat</span><strong>${n.karbohidrat||"-"}</strong></div>
-        <div class="nut-row"><span>Serat</span><strong>${n.serat||"-"}</strong></div>
-      </div>
-    `).join("");
+    // Kompatibel dengan data lama yang hanya punya satu foto/menu dan nutrition.
+    document.getElementById("menuGroupsSection").style.display="none";
+
+    const menu=Array.isArray(data.menu)?data.menu:[];
+    document.getElementById("legacySection").style.display="block";
+    document.getElementById("menuList").innerHTML=menu.length
+      ? menu.map(item=>"<li>"+escapeHtml(item)+"</li>").join("")
+      : "<li>Menu belum tersedia.</li>";
+
+    const nutrition=Array.isArray(data.nutrition)?data.nutrition:[];
+    const nutritionOrder=["PORSI KECIL","PORSI BESAR","BALITA","BUMIL & BUSUI"];
+    const nutritionByName={};
+    nutrition.forEach(n=>{
+      const key=String(n.nama||"").trim().toUpperCase();
+      if(key)nutritionByName[key]=n;
+    });
+    const orderedNutrition=nutritionOrder.map(name=>nutritionByName[name]).filter(Boolean);
+
+    document.getElementById("legacyNutritionSection").style.display="block";
+    document.getElementById("nutritionCards").innerHTML=orderedNutrition.length
+      ? orderedNutrition.map((n,index)=>`
+        <div class="nutrition-card stagger-card" style="transition-delay:${index*100}ms">
+          <h3>${escapeHtml(n.nama||"Informasi Gizi")}</h3>
+          ${n.total_porsi?`<p class="total"><strong>Total porsi:</strong> ${escapeHtml(n.total_porsi)}</p>`:""}
+          <div class="nut-row"><span>Energi</span><strong>${escapeHtml(n.energi||"-")}</strong></div>
+          <div class="nut-row"><span>Protein</span><strong>${escapeHtml(n.protein||"-")}</strong></div>
+          <div class="nut-row"><span>Lemak</span><strong>${escapeHtml(n.lemak||"-")}</strong></div>
+          <div class="nut-row"><span>Karbohidrat</span><strong>${escapeHtml(n.karbohidrat||"-")}</strong></div>
+          <div class="nut-row"><span>Serat</span><strong>${escapeHtml(n.serat||"-")}</strong></div>
+        </div>`).join("")
+      : '<div class="empty">Belum ada informasi gizi.</div>';
   }
 
   document.getElementById("expiry").innerHTML =
     data.batas_konsumsi
-      ? "<strong>Batas konsumsi:</strong> "+data.batas_konsumsi
+      ? "<strong>Batas konsumsi:</strong> "+escapeHtml(data.batas_konsumsi)
       : "Belum ada informasi batas konsumsi.";
 }
 

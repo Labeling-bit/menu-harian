@@ -6,26 +6,26 @@
 <title>Admin Menu Harian</title>
 <style>
 body{margin:0;background:#f7f0e5;color:#15243b;font-family:Arial,sans-serif}
-main{max-width:760px;margin:auto;padding:15px}
+main{max-width:900px;margin:auto;padding:15px}
 .c{background:#fff;border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 5px 18px #0001}
 h1,h2,h3{margin-top:0}
 label{display:block;font-weight:bold;margin:12px 0 5px}
-input,textarea{width:100%;padding:11px;border:1px solid #ccd1d8;border-radius:9px;font-size:16px;box-sizing:border-box}
-textarea{min-height:100px}
-
-.g{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-.portion-box{border:1px solid #e1e5ea;border-radius:14px;padding:16px;background:#fafafa}
-select{width:100%;padding:11px;border:1px solid #ccd1d8;border-radius:9px;font-size:16px;box-sizing:border-box;background:#fff;color:#15243b}
-
+input,textarea,select{width:100%;padding:11px;border:1px solid #ccd1d8;border-radius:9px;font-size:16px;box-sizing:border-box}
+textarea{min-height:110px}
 button{padding:13px 18px;border:0;border-radius:10px;background:#15243b;color:white;font-weight:bold;margin-top:15px;font-size:15px}
 button:disabled{opacity:.55}
 .hint{color:#667085;line-height:1.5;font-size:14px}
-.ok{color:#087443;font-weight:bold}
-.err{color:#b42318;font-weight:bold}
-.prev{max-width:100%;max-height:350px;margin-top:10px;border-radius:10px}
-hr{border:0;border-top:1px solid #eee;margin:20px 0}
-.small{font-size:13px}
-@media(max-width:600px){.g{grid-template-columns:1fr}}
+.ok{color:#087443;font-weight:bold}.err{color:#b42318;font-weight:bold}
+.prev{width:100%;max-height:330px;object-fit:cover;margin-top:10px;border-radius:14px;display:none}
+.menu-layout{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.nut-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.nut-box{border:1px solid #e1e5ea;border-radius:14px;padding:15px;background:#fafafa}
+.nut-box h3{font-size:18px;margin-bottom:8px}
+.group-title{padding:12px 14px;background:#f2eee7;border-radius:12px;margin-bottom:12px}
+.save{width:100%;font-size:16px}
+@media(max-width:700px){
+  .menu-layout,.nut-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -34,348 +34,233 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 <section class="c">
 <h1>📝 Admin Menu Harian</h1>
 <b>SPPG Lamongan Sugio German 2</b>
-<p class="hint">
-Sekarang menu dapat <b>langsung disimpan ke GitHub</b>. Setelah berhasil, website utama akan memakai data terbaru.
-</p>
+<p class="hint">Isi dua menu jika menu untuk porsi umum berbeda dengan menu Balita dan Bumil & Busui. Data akan langsung disimpan ke GitHub.</p>
 </section>
 
 <section class="c">
 <h2>🔐 Koneksi GitHub</h2>
-
 <label>GitHub Personal Access Token</label>
 <input id="token" type="password" autocomplete="off" placeholder="ghp_... atau github_pat_...">
-
-<p class="hint small">
-Token hanya dipakai di browser ini untuk mengirim perubahan ke repository.
-<b>Jangan pernah menaruh token di dalam kode admin.html atau mengirimkannya kepada orang lain.</b>
-</p>
-
+<p class="hint small">Token hanya dipakai di browser ini untuk mengirim perubahan ke repository Anda. <b>Jangan pernah menaruh token di dalam kode admin.html atau mengirimkannya kepada orang lain.</b></p>
 <label>Commit message</label>
 <input id="commit" value="Update menu harian">
-
 </section>
 
 <section class="c">
-<h2>1. Menu</h2>
-
+<h2>📅 Data Menu</h2>
 <label>Tanggal</label>
 <input type="date" id="d">
+<label>Batas konsumsi</label>
+<input id="b" placeholder="31 Agustus 2026, pukul 12.00">
+</section>
 
-<label>Foto menu</label>
-<input type="file" id="f" accept="image/*">
-<img id="p" class="prev" style="display:none">
+<section class="c">
+<div class="group-title">
+<h2>🍽️ Menu 1 — Porsi Kecil & Porsi Besar</h2>
+<p class="hint">Foto dan daftar menu untuk porsi kecil/besar.</p>
+</div>
 
-<label>Menu (satu item per baris)</label>
-<textarea id="m" placeholder="Nasi putih
+<div class="menu-layout">
+<div>
+<label>Foto Menu 1</label>
+<input type="file" id="f1" accept="image/*">
+<img id="p1" class="prev" alt="Preview Foto Menu 1">
+<label>Menu 1 (satu item per baris)</label>
+<textarea id="m1" placeholder="Nasi putih
 Ayam goreng
 Sayur
 Buah"></textarea>
+</div>
 
-<label>Batas konsumsi</label>
-<input id="b" placeholder="29 Agustus 2026, pukul 12.00">
-
+<div>
+<h3>Gizi Menu 1</h3>
+<div class="nut-grid">
+<div class="nut-box">
+<h3>Porsi Kecil</h3>
+<label>Energi</label><input id="k_e" placeholder="kkal">
+<label>Protein</label><input id="k_p" placeholder="gram">
+<label>Lemak</label><input id="k_l" placeholder="gram">
+<label>Karbohidrat</label><input id="k_k" placeholder="gram">
+<label>Serat</label><input id="k_s" placeholder="gram">
+</div>
+<div class="nut-box">
+<h3>Porsi Besar</h3>
+<label>Energi</label><input id="b_e" placeholder="kkal">
+<label>Protein</label><input id="b_p" placeholder="gram">
+<label>Lemak</label><input id="b_l" placeholder="gram">
+<label>Karbohidrat</label><input id="b_k" placeholder="gram">
+<label>Serat</label><input id="b_s" placeholder="gram">
+</div>
+</div>
+</div>
+</div>
 </section>
 
 <section class="c">
-  <h2>2. Gizi</h2>
+<div class="group-title">
+<h2>👶 Menu 2 — Balita & Bumil & Busui</h2>
+<p class="hint">Foto dan daftar menu khusus Balita serta Bumil & Busui.</p>
+</div>
 
-  <div class="g">
-    <div class="portion-box">
-      
-      <label>Jenis Porsi</label>
-      <select id="p1nama">
-        <option value="PORSI KECIL">Porsi Kecil</option>
-        <option value="PORSI BESAR">Porsi Besar</option>
-        <option value="BUMIL">Bumil</option>
-        <option value="BALITA">Balita</option>
-        <option value="BUSUI">Busui</option>
-      </select>
+<div class="menu-layout">
+<div>
+<label>Foto Menu 2</label>
+<input type="file" id="f2" accept="image/*">
+<img id="p2" class="prev" alt="Preview Foto Menu 2">
+<label>Menu 2 (satu item per baris)</label>
+<textarea id="m2" placeholder="Nasi tim
+Ayam
+Sayur
+Buah"></textarea>
+</div>
 
-      <label>Energi</label><input id="p1e" placeholder="kkal">
-      <label>Protein</label><input id="p1p" placeholder="gram">
-      <label>Lemak</label><input id="p1l" placeholder="gram">
-      <label>Karbohidrat</label><input id="p1k" placeholder="gram">
-      <label>Serat</label><input id="p1s" placeholder="gram">
-    </div>
+<div>
+<h3>Gizi Menu 2</h3>
+<div class="nut-grid">
+<div class="nut-box">
+<h3>Balita</h3>
+<label>Energi</label><input id="a_e" placeholder="kkal">
+<label>Protein</label><input id="a_p" placeholder="gram">
+<label>Lemak</label><input id="a_l" placeholder="gram">
+<label>Karbohidrat</label><input id="a_k" placeholder="gram">
+<label>Serat</label><input id="a_s" placeholder="gram">
+</div>
+<div class="nut-box">
+<h3>Bumil & Busui</h3>
+<label>Energi</label><input id="u_e" placeholder="kkal">
+<label>Protein</label><input id="u_p" placeholder="gram">
+<label>Lemak</label><input id="u_l" placeholder="gram">
+<label>Karbohidrat</label><input id="u_k" placeholder="gram">
+<label>Serat</label><input id="u_s" placeholder="gram">
+</div>
+</div>
+</div>
+</div>
 
-    <div class="portion-box">
-      
-      <label>Jenis Porsi</label>
-      <select id="p2nama">
-        <option value="PORSI BESAR">Porsi Besar</option>
-        <option value="PORSI KECIL">Porsi Kecil</option>
-        <option value="BUMIL">Bumil</option>
-        <option value="BALITA">Balita</option>
-        <option value="BUSUI">Busui</option>
-      </select>
-
-      <label>Energi</label><input id="p2e" placeholder="kkal">
-      <label>Protein</label><input id="p2p" placeholder="gram">
-      <label>Lemak</label><input id="p2l" placeholder="gram">
-      <label>Karbohidrat</label><input id="p2k" placeholder="gram">
-      <label>Serat</label><input id="p2s" placeholder="gram">
-    </div>
-  </div>
-
-  <button id="save" onclick="saveToGitHub()">💾 SIMPAN MENU KE WEBSITE</button>
+<button id="save" class="save" onclick="saveToGitHub()">💾 SIMPAN MENU KE WEBSITE</button>
 <p id="ok" class="hint"></p>
 </section>
 
 <section class="c">
-<h2>3. Cara kerja</h2>
-<p class="hint">
-Klik <b>SIMPAN MENU KE WEBSITE</b>. Admin akan mengambil <b>data.js</b> yang sekarang,
-mempertahankan tanggal-tanggal lama, menambahkan/mengganti tanggal yang Anda isi,
-lalu melakukan commit otomatis ke GitHub.
-</p>
-<p class="hint">
-Anda tidak perlu lagi download <b>data.js</b> atau upload manual.
-</p>
+<h2>ℹ️ Cara kerja</h2>
+<p class="hint">Menu 1 akan tampil dengan foto + gizi Porsi Kecil/Porsi Besar. Di bawahnya Menu 2 akan tampil dengan foto + gizi Balita/Bumil & Busui.</p>
+<p class="hint">Tanggal-tanggal lama tetap dipertahankan saat menyimpan.</p>
 </section>
 
 </main>
 
 <script>
-const OWNER = "Labeling-bit";
-const REPO = "menu-harian";
-const BRANCH = "main";
-const FILE_PATH = "data.js";
+const OWNER="Labeling-bit", REPO="menu-harian", BRANCH="main", FILE_PATH="data.js";
+let img1="", img2="";
+const $=id=>document.getElementById(id);
+const q=id=>$(id).value.trim();
 
-let imgData = "";
-
-const $ = id => document.getElementById(id);
-
-$("f").onchange = () => {
-  const file = $("f").files[0];
-  if (!file) return;
-
-  const r = new FileReader();
-
-  r.onload = e => {
-    const im = new Image();
-
-    im.onload = () => {
-      const s = Math.min(1, 1200 / im.width, 1200 / im.height);
-      const c = document.createElement("canvas");
-
-      c.width = Math.round(im.width * s);
-      c.height = Math.round(im.height * s);
-
-      c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
-
-      imgData = c.toDataURL("image/jpeg", 0.78);
-
-      $("p").src = imgData;
-      $("p").style.display = "block";
+function preview(fileId,imgId,setter){
+  $(fileId).onchange=()=>{
+    const file=$(fileId).files[0]; if(!file)return;
+    const r=new FileReader();
+    r.onload=e=>{
+      const im=new Image();
+      im.onload=()=>{
+        const s=Math.min(1,1200/im.width,1200/im.height);
+        const c=document.createElement("canvas");
+        c.width=Math.round(im.width*s); c.height=Math.round(im.height*s);
+        c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+        const data=c.toDataURL("image/jpeg",.78);
+        setter(data); $(imgId).src=data; $(imgId).style.display="block";
+      };
+      im.src=e.target.result;
     };
-
-    im.src = e.target.result;
+    r.readAsDataURL(file);
   };
-
-  r.readAsDataURL(file);
-};
-
-function q(id){
-  return $(id).value.trim();
 }
+preview("f1","p1",v=>img1=v);
+preview("f2","p2",v=>img2=v);
 
-function show(message, type){
-  $("ok").className = "hint " + type;
-  $("ok").textContent = message;
+function show(message,type){
+  $("ok").className="hint "+type;
+  $("ok").textContent=message;
 }
-
 function utf8ToBase64(str){
-  const bytes = new TextEncoder().encode(str);
-  let binary = "";
-  const chunk = 0x8000;
-
-  for(let i = 0; i < bytes.length; i += chunk){
-    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
-  }
-
+  const bytes=new TextEncoder().encode(str); let binary="";
+  for(let i=0;i<bytes.length;i+=0x8000) binary+=String.fromCharCode(...bytes.subarray(i,i+0x8000));
   return btoa(binary);
 }
-
 function base64ToUtf8(str){
-  const binary = atob(str.replace(/\n/g, ""));
-  const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
-  return new TextDecoder().decode(bytes);
+  const binary=atob(str.replace(/\n/g,""));
+  return new TextDecoder().decode(Uint8Array.from(binary,c=>c.charCodeAt(0)));
 }
-
 async function getCurrentFile(token){
-  const url =
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE_PATH}?ref=${BRANCH}`;
-
-  const res = await fetch(url, {
-    headers: {
-      "Accept": "application/vnd.github+json",
-      "Authorization": "Bearer " + token,
-      "X-GitHub-Api-Version": "2026-03-10"
-    }
-  });
-
-  const data = await res.json();
-
-  if(!res.ok){
-    throw new Error(data.message || "Gagal membaca data.js dari GitHub.");
-  }
-
-  let text = "";
-
-  if(data.content && data.encoding === "base64"){
-    text = base64ToUtf8(data.content);
-  }else if(data.download_url){
-    const raw = await fetch(data.download_url + "?t=" + Date.now());
-    text = await raw.text();
-  }else{
-    throw new Error("Isi data.js tidak dapat dibaca.");
-  }
-
-  return {
-    sha: data.sha,
-    text
-  };
+  const url=`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE_PATH}?ref=${BRANCH}`;
+  const res=await fetch(url,{headers:{"Accept":"application/vnd.github+json","Authorization":"Bearer "+token,"X-GitHub-Api-Version":"2026-03-10"}});
+  const data=await res.json();
+  if(!res.ok)throw new Error(data.message||"Gagal membaca data.js dari GitHub.");
+  let text="";
+  if(data.content&&data.encoding==="base64")text=base64ToUtf8(data.content);
+  else if(data.download_url)text=await (await fetch(data.download_url+"?t="+Date.now())).text();
+  else throw new Error("Isi data.js tidak dapat dibaca.");
+  return {sha:data.sha,text};
 }
-
 function parseMenuData(text){
-  const match = text.match(
-    /const\s+menuData\s*=\s*([\s\S]*?)\s*;\s*$/
-  );
-
-  if(!match){
-    throw new Error("Format data.js lama tidak dikenali.");
-  }
-
-  try{
-    return JSON.parse(match[1]);
-  }catch(e){
-    throw new Error("Data menu lama tidak dapat dibaca.");
-  }
+  const match=text.match(/const\s+menuData\s*=\s*([\s\S]*?)\s*;\s*$/);
+  if(!match)throw new Error("Format data.js lama tidak dikenali.");
+  try{return JSON.parse(match[1]);}catch(e){throw new Error("Data menu lama tidak dapat dibaca.");}
 }
-
 function buildDataFile(menuData){
-  return (
-`const siteInfo = { instansi: 'SPPG Lamongan Sugio German 2' };
-const menuData = ` +
-JSON.stringify(menuData, null, 2) +
-`;\n`
-  );
+  return `const siteInfo = { instansi: 'SPPG Lamongan Sugio German 2' };\nconst menuData = ${JSON.stringify(menuData,null,2)};\n`;
 }
-
-async function updateFile(token, sha, content){
-  const url =
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE_PATH}`;
-
-  const body = {
-    message: q("commit") || "Update menu harian",
-    content: utf8ToBase64(content),
-    sha: sha,
-    branch: BRANCH
-  };
-
-  const res = await fetch(url, {
-    method: "PUT",
-    headers: {
-      "Accept": "application/vnd.github+json",
-      "Authorization": "Bearer " + token,
-      "X-GitHub-Api-Version": "2026-03-10",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(body)
-  });
-
-  const data = await res.json();
-
-  if(!res.ok){
-    throw new Error(data.message || "Gagal menyimpan data.js ke GitHub.");
-  }
-
-  return data;
+async function updateFile(token,sha,content){
+  const url=`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE_PATH}`;
+  const body={message:q("commit")||"Update menu harian",content:utf8ToBase64(content),sha,branch:BRANCH};
+  const res=await fetch(url,{method:"PUT",headers:{"Accept":"application/vnd.github+json","Authorization":"Bearer "+token,"X-GitHub-Api-Version":"2026-03-10","Content-Type":"application/json"},body:JSON.stringify(body)});
+  const data=await res.json();
+  if(!res.ok)throw new Error(data.message||"Gagal menyimpan data.js ke GitHub.");
 }
-
+function nutrition(nama,prefix){
+  return {nama,energi:q(prefix+"_e"),protein:q(prefix+"_p"),lemak:q(prefix+"_l"),karbohidrat:q(prefix+"_k"),serat:q(prefix+"_s")};
+}
 async function saveToGitHub(){
+  const token=q("token"), tanggal=q("d");
+  if(!token){alert("Masukkan GitHub Personal Access Token terlebih dahulu.");return;}
+  if(!tanggal){alert("Tanggal wajib diisi.");return;}
+  if(!img1||!q("m1")){alert("Foto Menu 1 dan Menu 1 wajib diisi.");return;}
+  if(!img2||!q("m2")){alert("Foto Menu 2 dan Menu 2 wajib diisi.");return;}
 
-  const token = q("token");
-  const tanggal = q("d");
-  const menuText = q("m");
-
-  if(!token){
-    alert("Masukkan GitHub Personal Access Token terlebih dahulu.");
-    return;
-  }
-
-  if(!tanggal || !menuText || !imgData){
-    alert("Tanggal, menu, dan foto wajib diisi.");
-    return;
-  }
-
-  $("save").disabled = true;
-  show("⏳ Sedang menyimpan menu ke GitHub...", "");
-
+  $("save").disabled=true; show("⏳ Sedang menyimpan menu ke GitHub...","");
   try{
+    const current=await getCurrentFile(token);
+    const menuData=parseMenuData(current.text);
 
-    // 1. Ambil data.js yang sekarang
-    const current = await getCurrentFile(token);
-
-    // 2. Baca semua tanggal yang sudah ada
-    const menuData = parseMenuData(current.text);
-
-    // 3. Tambah / ganti tanggal yang baru
-    menuData[tanggal] = {
-      photo: imgData,
-
-      menu: menuText
-        .split(/\n/)
-        .map(x => x.trim())
-        .filter(Boolean),
-
-      nutrition: [
+    menuData[tanggal]={
+      menu_groups:[
         {
-          nama: q("p1nama"),
-          energi: q("p1e"),
-          protein: q("p1p"),
-          lemak: q("p1l"),
-          karbohidrat: q("p1k"),
-          serat: q("p1s")
+          nama:"Menu 1 — Porsi Kecil & Porsi Besar",
+          photo:img1,
+          menu:q("m1").split(/\n/).map(x=>x.trim()).filter(Boolean),
+          nutrition:[
+            nutrition("PORSI KECIL","k"),
+            nutrition("PORSI BESAR","b")
+          ]
         },
         {
-          nama: q("p2nama"),
-          energi: q("p2e"),
-          protein: q("p2p"),
-          lemak: q("p2l"),
-          karbohidrat: q("p2k"),
-          serat: q("p2s")
+          nama:"Menu 2 — Balita & Bumil & Busui",
+          photo:img2,
+          menu:q("m2").split(/\n/).map(x=>x.trim()).filter(Boolean),
+          nutrition:[
+            nutrition("BALITA","a"),
+            nutrition("BUMIL & BUSUI","u")
+          ]
         }
       ],
-
-      batas_konsumsi: q("b")
+      batas_konsumsi:q("b")
     };
 
-    // 4. Buat data.js baru
-    const newContent = buildDataFile(menuData);
-
-    // 5. Commit langsung ke GitHub
-    await updateFile(token, current.sha, newContent);
-
-    show(
-      "✅ Berhasil! Menu sudah tersimpan ke GitHub. Website akan diperbarui otomatis.",
-      "ok"
-    );
-
+    await updateFile(token,current.sha,buildDataFile(menuData));
+    show("✅ Berhasil! Dua menu dan empat kotak gizi sudah tersimpan. Website akan diperbarui otomatis.","ok");
   }catch(err){
-
-    console.error(err);
-
-    show(
-      "❌ Gagal: " + err.message,
-      "err"
-    );
-
-  }finally{
-    $("save").disabled = false;
-  }
+    console.error(err); show("❌ Gagal: "+err.message,"err");
+  }finally{$("save").disabled=false;}
 }
 </script>
-
 </body>
 </html>
